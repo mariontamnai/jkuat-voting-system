@@ -146,3 +146,89 @@ body {
 .screen-container {
   padding: 10px 0;
 }
+
+.jkuat-logo-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 15px;
+  mix-blend-mode: multiply; /* ← removes white background */
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  background-color: #f5f5f5;
+  font-size: 1rem;
+  color: #333;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  background-color: #e8f5e9;
+  box-shadow: 0 0 0 2px #2e7d32;
+}
+
+/* Alert */
+.alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.alert-error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.alert-success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+/* Ghost button */
+.btn-ghost {
+  background-color: transparent;
+  color: #777;
+  border: 2px dashed #ccc;
+}
+
+.btn-ghost:hover {
+  background-color: #f5f5f5;
+}
+
+.helper-text {
+  color: #777;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Card title */
+.card h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  text-align: center;
+}
