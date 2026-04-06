@@ -1,6 +1,6 @@
 import config from '../config';
 import { mockCandidates } from '../mock/candidates';
-import { mockResults } from '../mock/results';
+import { getMockResults } from '../mock/results';
 
 export const getCandidates = async () => {
   if (config.USE_MOCK) {
@@ -32,7 +32,7 @@ export const castVote = async (candidateId, studentId, token) => {
 export const getResults = async () => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 500));
-    return { success: true, results: mockResults }
+    return { success: true, results: getMockResults() }
   }
 
   const response = await fetch(`${config.API_URL}/api/results`)

@@ -24,6 +24,7 @@ const Results = () => {
     if (result.success) {
       setResults(result.results);
       setLastUpdated(new Date());
+      /*console.log('Updated:', result.results.totalVotes, result.results.candidates[0].name);*/
     }
     setLoading(false);
   };

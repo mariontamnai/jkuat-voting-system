@@ -430,6 +430,12 @@ body {
   color: #777;
 }
 
+.candidate-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .section-title {
   text-align: center;
   font-size: 1.3rem;

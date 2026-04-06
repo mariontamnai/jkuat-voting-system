@@ -103,35 +103,43 @@ const CastVote = () => {
             <div className="section-divider" />
 
             {loading ? (
-              <div className="loading-text">Loading candidates...</div>
-            ) : (
-              <div className="candidates-grid">
-                {candidates.map(candidate => (
-                  <CandidateCard
-                    key={candidate.id}
-                    candidate={candidate}
-                    selected={selectedCandidate?.id === candidate.id}
-                    onSelect={setSelectedCandidate}
-                  />
-                ))}
-              </div>
-            )}
+  <div className="loading-text">Loading candidates...</div>
+) : (
+  <>
+    {user?.hasVoted && (
+      <div className="alert alert-error">
+        You have already voted. Candidates are locked.
+      </div>
+    )}
+    <div className="candidates-grid">
+      {candidates.map(candidate => (
+        <CandidateCard
+          key={candidate.id}
+          candidate={candidate}
+          selected={selectedCandidate?.id === candidate.id}
+          onSelect={user?.hasVoted ? () => {} : setSelectedCandidate}
+          disabled={user?.hasVoted}
+        />
+      ))}
+    </div>
+  </>
+)}
 
-            {selectedCandidate && (
-              <div className="alert alert-success">
-                You selected: <strong>{selectedCandidate.name}</strong>
-              </div>
-            )}
+{selectedCandidate && !user?.hasVoted && (
+  <div className="alert alert-success">
+    You selected: <strong>{selectedCandidate.name}</strong>
+  </div>
+)}
 
-            <div className="button-group" style={{ marginTop: '20px' }}>
-              <button
-                className="btn btn-primary"
-                onClick={handleSubmitVote}
-                disabled={!selectedCandidate || submitting}
-              >
-                {submitting ? 'SUBMITTING...' : 'SUBMIT VOTE'}
-              </button>
-            </div>
+<div className="button-group" style={{ marginTop: '20px' }}>
+  <button
+    className="btn btn-primary"
+    onClick={handleSubmitVote}
+    disabled={!selectedCandidate || submitting || user?.hasVoted}
+  >
+    {user?.hasVoted ? 'ALREADY VOTED' : submitting ? 'SUBMITTING...' : 'SUBMIT VOTE'}
+  </button>
+</div>
           </div>
         </div>
       </div>
