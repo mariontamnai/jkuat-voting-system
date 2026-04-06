@@ -2,15 +2,17 @@ import React from 'react';
 
 const ResultBar = ({ candidate, rank, isLeader }) => {
   return (
-    <div className={`result-bar-container ${isLeader ? 'leader' : ''}`}>
-      <div className="result-bar-header">
-        <span className="rank">{rank}</span>
-        <span className="name">{candidate.name}</span>
-        <span className="votes">{candidate.votes} votes</span>
+    <div className={`result-item ${isLeader ? 'leader' : ''}`}>
+      <div className="result-item-header">
+        <div className="result-rank-name">
+          <span className={`rank-badge ${isLeader ? 'rank-leader' : ''}`}>{rank}</span>
+          <span className="result-name">{candidate.name}</span>
+        </div>
+        <span className="result-votes">{candidate.votes}</span>
       </div>
-      <div className="progress-bar">
-        <div 
-          className="progress-fill"
+      <div className="result-progress">
+        <div
+          className={`result-fill ${isLeader ? 'fill-leader' : 'fill-other'}`}
           style={{ width: `${candidate.percentage}%` }}
         >
           {candidate.percentage}%

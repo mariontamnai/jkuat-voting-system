@@ -6,6 +6,9 @@ const CandidateCard = ({ candidate, selected, onSelect }) => {
       className={`candidate-card ${selected ? 'selected' : ''}`}
       onClick={() => onSelect(candidate)}
     >
+      {selected && (
+        <div className="tick-mark">✓</div>
+      )}
       <div className="candidate-avatar">
         {candidate.name.split(' ').map(n => n[0]).join('')}
       </div>

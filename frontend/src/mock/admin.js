@@ -7,6 +7,6 @@ export const mockAdminStats = {
 }
 
 export const mockStudents = [
-  { id: 1, name: "John Kamau", regNo: "SCT111-0111/1900", course: "Computer Science", year: "3rd", email: "john@students.jkuat.ac.ke", hasVoted: true },
-  { id: 2, name: "Mary Wambui", regNo: "SCT111-0112/1900", course: "Computer Science", year: "3rd", email: "mary@students.jkuat.ac.ke", hasVoted: false }
+  { id: 1, name: "John Kamau", regNo: "SCT111-0111/1900", year: "3rd", email: "john@students.jkuat.ac.ke", hasVoted: true },
+  { id: 2, name: "Mary Wambui", regNo: "SCT111-0112/1900", year: "3rd", email: "mary@students.jkuat.ac.ke", hasVoted: false }
 ]
