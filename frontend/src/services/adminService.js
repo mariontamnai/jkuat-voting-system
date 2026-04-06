@@ -1,10 +1,10 @@
 import config from '../config';
-import { mockAdminStats, mockStudents } from '../mock/admin';
+import { getMockAdminStats, mockStudents } from '../mock/admin';
 
-export const getAdminStats = async () => {
+export const getAdminStats = async (phase) => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 500));
-    return { success: true, stats: mockAdminStats }
+    return { success: true, stats: getMockAdminStats(phase) }
   }
 
   const response = await fetch(`${config.API_URL}/api/admin/stats`)

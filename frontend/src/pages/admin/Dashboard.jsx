@@ -26,10 +26,20 @@ const Dashboard = () => {
       return;
     }
     loadStats();
-  }, []);
+}, []);
+
+useEffect(() => {
+    let interval;
+    if (phase === 'voting') {
+      interval = setInterval(() => {
+        loadStats();
+      }, 5000);
+    }
+    return () => clearInterval(interval);
+}, [phase]);
 
   const loadStats = async () => {
-    const result = await getAdminStats();
+    const result = await getAdminStats(phase);
     if (result.success) {
       setStats(result.stats);
     }

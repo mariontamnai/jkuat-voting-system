@@ -84,23 +84,7 @@ const StudentLogin = () => {
                 BACK TO HOME
               </button>
 
-              <p className="helper-text">Want to explore without an account?</p>
-              <button
-                className="btn btn-ghost"
-                onClick={() => {
-                  sessionStorage.setItem('user', JSON.stringify({
-                    id: 999,
-                    name: "Demo User",
-                    regNo: "DEMO001",
-                    hasVoted: false,
-                    sessionToken: "DEMO",
-                    role: "student"
-                  }));
-                  navigate('/face-recognition');
-                }}
-              >
-                TRY DEMO
-              </button>
+              
             </div>
           </div>
         </div>

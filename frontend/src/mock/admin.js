@@ -1,12 +1,21 @@
-export const mockAdminStats = {
-  totalVotes: 200,
-  turnout: 40,
-  sessions: 5,
-  verified: 200,
-  phase: "ACTIVE"
-}
+import { getMockResults } from './results';
 
-export const mockStudents = [
-  { id: 1, name: "John Kamau", regNo: "SCT111-0111/1900", year: "3rd", email: "john@students.jkuat.ac.ke", hasVoted: true },
-  { id: 2, name: "Mary Wambui", regNo: "SCT111-0112/1900", year: "3rd", email: "mary@students.jkuat.ac.ke", hasVoted: false }
-]
+export const getMockAdminStats = (phase) => {
+  if (phase === 'voting') {
+    const results = getMockResults();
+    return {
+      totalVotes: results.totalVotes,
+      turnout: results.turnout,
+      sessions: 5,
+      verified: results.totalVotes,
+      phase: "ACTIVE"
+    }
+  }
+  return {
+    totalVotes: 0,
+    turnout: 0,
+    sessions: 0,
+    verified: 0,
+    phase: "INACTIVE"
+  }
+}
