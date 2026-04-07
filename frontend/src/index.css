@@ -694,3 +694,108 @@ body {
 .stats-grid {
   grid-template-columns: 1fr 1fr;
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .jkuat-logo-img {
+    width: 75px;
+    height: 75px;
+  }
+
+  .card {
+    padding: 25px 15px;
+  }
+
+  .card h2 {
+    font-size: 1.4rem;
+  }
+
+  .badges {
+    gap: 6px;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+
+  .candidates-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .candidate-card {
+    padding: 15px 10px;
+  }
+
+  .candidate-avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 0.9rem;
+  }
+
+  .candidate-card h3 {
+    font-size: 0.8rem;
+  }
+
+  .candidate-card p {
+    font-size: 0.7rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-box h3 {
+    font-size: 1.3rem;
+  }
+
+  .current-leader h3 {
+    font-size: 1.3rem;
+  }
+
+  .result-votes {
+    font-size: 1.2rem;
+  }
+
+  .voter-info-label {
+    font-size: 0.8rem;
+  }
+
+  .voter-info-value {
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    padding: 15px;
+    font-size: 0.9rem;
+  }
+
+  .video-container {
+    max-width: 100%;
+  }
+
+  .face-overlay {
+    width: 160px;
+    height: 210px;
+  }
+
+  .admin-section {
+    padding: 15px;
+  }
+
+  .results-footer-row {
+    font-size: 0.8rem;
+  }
+}

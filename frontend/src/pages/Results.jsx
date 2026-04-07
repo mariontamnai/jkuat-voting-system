@@ -10,32 +10,29 @@ const Results = () => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [countdown, setCountdown] = useState(5);
+  const [sessionEnded, setSessionEnded] = useState(
+    sessionStorage.getItem('sessionStatus') === 'ended'
+  );
+
+  const admin = JSON.parse(sessionStorage.getItem('admin'));
 
   useEffect(() => {
     loadResults();
     const interval = setInterval(() => {
+      const status = sessionStorage.getItem('sessionStatus');
+      if (status === 'ended') {
+        setSessionEnded(true);
+        clearInterval(interval);
+        return;
+      }
       loadResults();
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const loadResults = async () => {
-    const result = await getResults();
-    if (result.success) {
-      setResults(result.results);
-      setLastUpdated(new Date());
-      /*console.log('Updated:', result.results.totalVotes, result.results.candidates[0].name);*/
-    }
-    setLoading(false);
-  };
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString();
-  };
-
-  const [countdown, setCountdown] = useState(5);
-
   useEffect(() => {
+    if (sessionEnded) return;
     const timer = setInterval(() => {
       setCountdown(prev => {
         if (prev === 1) return 5;
@@ -43,7 +40,20 @@ const Results = () => {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [sessionEnded]);
+
+  const loadResults = async () => {
+    const result = await getResults();
+    if (result.success) {
+      setResults(result.results);
+      setLastUpdated(new Date());
+    }
+    setLoading(false);
+  };
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString();
+  };
 
   return (
     <div className="voting-system">
@@ -54,7 +64,11 @@ const Results = () => {
         <div className="screen-container">
           <div className="card">
             <h2>Live Election Results</h2>
-            <p className="live-indicator"> LIVE — Auto-updating every 5 seconds</p>
+            <p className="live-indicator">
+              {sessionEnded
+                ? ' Session Ended — Final Results'
+                : ' LIVE — Auto-updating every 5 seconds'}
+            </p>
 
             {loading ? (
               <div className="loading-text">Loading results...</div>
@@ -105,21 +119,33 @@ const Results = () => {
                   </div>
                   <div className="results-footer-row">
                     <span>Next Refresh:</span>
-                    <span>In {countdown} seconds</span>
+                    <span>{sessionEnded ? 'Stopped' : `In ${countdown} seconds`}</span>
                   </div>
                   <div className="results-footer-row">
                     <span>Status:</span>
-                    <span className="live-status">Live</span>
+                    <span className={sessionEnded ? 'ended-status' : 'live-status'}>
+                      {sessionEnded ? 'Ended' : 'Live'}
+                    </span>
                   </div>
                 </div>
 
                 <div className="button-group" style={{ marginTop: '20px' }}>
-                  <button
-                    className="btn btn-outline"
-                    onClick={() => navigate('/vote')}
-                  >
-                    BACK TO VOTING
-                  </button>
+                  {admin && (
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => navigate('/admin/dashboard')}
+                    >
+                      BACK TO DASHBOARD
+                    </button>
+                  )}
+                  {!admin && (
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => navigate('/vote')}
+                    >
+                      BACK TO VOTING
+                    </button>
+                  )}
                   <button
                     className="btn btn-danger"
                     onClick={() => {

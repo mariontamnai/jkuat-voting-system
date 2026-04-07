@@ -10,7 +10,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
-  const [phase, setPhase] = useState('idle');
+  const [phase, setPhase] = useState( sessionStorage.getItem('adminPhase') || 'idle' );
   const [studentForm, setStudentForm] = useState({
     name: '',
     year: '',
@@ -53,36 +53,42 @@ useEffect(() => {
   };
 
   const handleStartSession = async () => {
-    const result = await startSession();
-    if (result.success) {
-      setPhase('voting');
-      showMessage('Session started successfully!', 'success');
-      loadStats();
-    } else {
-      showMessage('Failed to start session', 'error');
-    }
-  };
+  const result = await startSession();
+  if (result.success) {
+    setPhase('voting');
+    sessionStorage.setItem('adminPhase', 'voting');
+    sessionStorage.setItem('sessionStatus', 'active');
+    showMessage('Session started successfully!', 'success');
+    loadStats();
+  } else {
+    showMessage('Failed to start session', 'error');
+  }
+};
 
-  const handleEndSession = async () => {
-    const result = await endSession();
-    if (result.success) {
-      setPhase('counting');
-      showMessage('Session ended successfully!', 'success');
-      loadStats();
-    } else {
-      showMessage('Failed to end session', 'error');
-    }
-  };
+const handleEndSession = async () => {
+  const result = await endSession();
+  if (result.success) {
+    setPhase('counting');
+    sessionStorage.setItem('adminPhase', 'counting');
+    sessionStorage.setItem('sessionStatus', 'ended');
+    showMessage('Session ended successfully!', 'success');
+    loadStats();
+  } else {
+    showMessage('Failed to end session', 'error');
+  }
+};
 
-  const handlePublishResults = async () => {
-    const result = await publishResults();
-    if (result.success) {
-      setPhase('idle');
-      showMessage('Results published successfully!', 'success');
-    } else {
-      showMessage('Failed to publish results', 'error');
-    }
-  };
+const handlePublishResults = async () => {
+  const result = await publishResults();
+  if (result.success) {
+    setPhase('idle');
+    sessionStorage.setItem('adminPhase', 'idle');
+    sessionStorage.removeItem('sessionStatus');
+    showMessage('Results published successfully!', 'success');
+  } else {
+    showMessage('Failed to publish results', 'error');
+  }
+};
 
   const handleAddStudent = async () => {
     if (!studentForm.name || !studentForm.year || !studentForm.email || !studentForm.regNo) {

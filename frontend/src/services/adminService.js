@@ -1,5 +1,6 @@
 import config from '../config';
 import { getMockAdminStats, mockStudents } from '../mock/admin';
+import { startMockSession, endMockSession } from '../mock/results';
 
 export const getAdminStats = async (phase) => {
   if (config.USE_MOCK) {
@@ -32,6 +33,7 @@ export const addStudent = async (studentData) => {
 export const startSession = async () => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 500));
+    startMockSession();
     return { success: true, message: 'Session started' }
   }
 
@@ -44,6 +46,7 @@ export const startSession = async () => {
 export const endSession = async () => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 500));
+    endMockSession();
     return { success: true, message: 'Session ended' }
   }
 
