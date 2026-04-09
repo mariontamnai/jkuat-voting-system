@@ -81,10 +81,11 @@ const handleEndSession = async () => {
 const handlePublishResults = async () => {
   const result = await publishResults();
   if (result.success) {
-    setPhase('idle');
-    sessionStorage.setItem('adminPhase', 'idle');
-    sessionStorage.removeItem('sessionStatus');
+    setPhase('published');
+    sessionStorage.setItem('adminPhase', 'published');
+    sessionStorage.setItem('resultsPublished', 'true');
     showMessage('Results published successfully!', 'success');
+    setTimeout(() => navigate('/winner'), 3000);
   } else {
     showMessage('Failed to publish results', 'error');
   }
@@ -126,6 +127,21 @@ const handlePublishResults = async () => {
               <>
                 <div className="phase-badge">Phase: {stats?.phase}</div>
 
+{phase === 'published' && (
+  <div className="alert alert-success">
+    ✅ Election is officially over. Results have been published.
+  </div>
+)}
+
+{phase === 'published' && (
+  <button
+    className="btn btn-primary"
+    style={{ marginBottom: '20px' }}
+    onClick={() => navigate('/winner')}
+  >
+    VIEW WINNER 🏆
+  </button>
+)}
                 <div className="stats-grid">
                   <div className="stat-box">
                     <h3>{stats?.totalVotes}</h3>
@@ -148,7 +164,7 @@ const handlePublishResults = async () => {
                 <div className="admin-section">
                   <h3 className="admin-section-title">Voting</h3>
                   <div className="button-group">
-                    <button className="btn btn-primary" onClick={handleStartSession} disabled={phase !== 'idle'}>
+                    <button className="btn btn-primary" onClick={handleStartSession} disabled={phase !== 'idle' || phase === 'published'}>
                       START SESSION
                     </button>
                     <button className="btn btn-outline" onClick={handleEndSession} disabled={phase !== 'voting'}>

@@ -695,6 +695,103 @@ body {
   grid-template-columns: 1fr 1fr;
 }
 
+.official-badge {
+  text-align: center;
+  background-color: #1b5e20;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  display: inline-block;
+  width: 100%;
+}
+
+.winner-container {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.trophy {
+  font-size: 4rem;
+  margin-bottom: 10px;
+}
+
+.winner-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #777;
+  margin-bottom: 8px;
+}
+
+.winner-name {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1b5e20;
+  margin-bottom: 5px;
+}
+
+.winner-faculty {
+  color: #777;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+.winner-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.winner-stat {
+  background-color: #f1f8e9;
+  border: 2px solid #c8e6c9;
+  border-radius: 12px;
+  padding: 15px 10px;
+  text-align: center;
+}
+
+.winner-stat h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #2e7d32;
+}
+
+.winner-stat p {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #555;
+  margin-top: 4px;
+}
+
+.final-stats {
+  background-color: #f1f8e9;
+  border: 1px solid #c8e6c9;
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-top: 20px;
+}
+
+.final-stats-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.final-stats-row:last-child {
+  border-bottom: none;
+}
+
+.official-text {
+  color: #1b5e20;
+}
+
 @media (max-width: 480px) {
   .container {
     padding: 10px;
