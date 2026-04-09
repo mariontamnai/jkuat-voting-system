@@ -30,6 +30,16 @@ export const addStudent = async (studentData) => {
   return response.json()
 }
 
+export const getStudents = async () => {
+  if (config.USE_MOCK) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { success: true, students: mockStudents }
+  }
+
+  const response = await fetch(`${config.API_URL}/api/admin/students`)
+  return response.json()
+}
+
 export const startSession = async () => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 500));

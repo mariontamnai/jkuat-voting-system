@@ -695,6 +695,122 @@ body {
   grid-template-columns: 1fr 1fr;
 }
 
+.students-table-container {
+  margin-top: 20px;
+}
+
+.students-table-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.students-table {
+  border: 1px solid #c8e6c9;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.students-table-header {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr;
+  background-color: #2e7d32;
+  color: white;
+  padding: 10px 15px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.students-table-row {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr;
+  padding: 10px 15px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.students-table-row:last-child {
+  border-bottom: none;
+}
+
+.students-table-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.voted-yes {
+  color: #2e7d32;
+  font-weight: 800;
+}
+
+.voted-no {
+  color: #e53935;
+  font-weight: 800;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 2px solid #c8e6c9;
+  background-color: white;
+  color: #2e7d32;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-tab.active {
+  background-color: #2e7d32;
+  color: white;
+  border-color: #2e7d32;
+}
+
+.filter-tab:hover {
+  background-color: #e8f5e9;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid #2e7d32;
+  background-color: white;
+  color: #2e7d32;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+  background-color: #e8f5e9;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+}
+
 .official-badge {
   text-align: center;
   background-color: #1b5e20;
