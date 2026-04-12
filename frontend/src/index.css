@@ -699,6 +699,26 @@ body {
   margin-top: 20px;
 }
 
+.page-top {
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #2e7d32;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
+
 .students-table-title {
   font-size: 0.95rem;
   font-weight: 700;

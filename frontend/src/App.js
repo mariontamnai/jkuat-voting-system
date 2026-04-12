@@ -10,6 +10,7 @@ import CastVote from './pages/CastVote';
 import VoteSubmitted from './pages/VoteSubmitted';
 import Results from './pages/Results';
 import Dashboard from './pages/admin/Dashboard';
+import Students from './pages/admin/Students';
 import WinnerAnnouncement from './pages/WinnerAnnouncement';
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/vote-submitted" element={<VoteSubmitted />} />
         <Route path="/results" element={<Results />} />
         <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/students" element={<Students />} />
         <Route path="/winner" element={<WinnerAnnouncement />} />
       </Routes>
     </Router>
