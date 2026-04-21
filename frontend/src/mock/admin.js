@@ -4,18 +4,18 @@ export const getMockAdminStats = (phase) => {
   if (phase === 'voting' || phase === 'counting') {
     const results = getMockResults();
     return {
+      totalStudents: 2000,
       totalVotes: results.totalVotes,
-      turnout: results.turnout,
-      sessions: 5,
-      verified: results.totalVotes,
+      totalElections: 1,
+      activeElections: phase === 'voting' ? 1 : 0,
       phase: phase === 'voting' ? 'ACTIVE' : 'COUNTING'
     }
   }
   return {
+    totalStudents: 2000,
     totalVotes: 0,
-    turnout: 0,
-    sessions: 0,
-    verified: 0,
+    totalElections: 1,
+    activeElections: 0,
     phase: "INACTIVE"
   }
 }

@@ -124,23 +124,23 @@ const Dashboard = () => {
                 )}
 
                 <div className="stats-grid">
-                  <div className="stat-box">
-                    <h3>{stats?.totalVotes}</h3>
-                    <p>VOTES</p>
-                  </div>
-                  <div className="stat-box">
-                    <h3>{stats?.turnout}%</h3>
-                    <p>TURNOUT</p>
-                  </div>
-                  <div className="stat-box">
-                    <h3>{stats?.sessions}</h3>
-                    <p>SESSIONS</p>
-                  </div>
-                  <div className="stat-box">
-                    <h3>{stats?.verified}</h3>
-                    <p>VERIFIED</p>
-                  </div>
-                </div>
+  <div className="stat-box">
+    <h3>{stats?.totalStudents}</h3>
+    <p>STUDENTS</p>
+  </div>
+  <div className="stat-box">
+    <h3>{stats?.totalVotes}</h3>
+    <p>VOTES</p>
+  </div>
+  <div className="stat-box">
+    <h3>{stats?.totalElections}</h3>
+    <p>ELECTIONS</p>
+  </div>
+  <div className="stat-box">
+    <h3>{stats?.activeElections}</h3>
+    <p>ACTIVE</p>
+  </div>
+</div>
 
                 <div className="admin-section">
                   <h3 className="admin-section-title">Voting</h3>
