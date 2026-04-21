@@ -77,3 +77,43 @@ export const publishResults = async () => {
   })
   return response.json()
 }
+
+export const updateStudent = async (studentId, studentData) => {
+  if (config.USE_MOCK) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { success: true, message: 'Student updated successfully' }
+  }
+
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/students/${studentId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ fullName: studentData.name })
+  })
+  const data = await response.json()
+  if (response.ok) {
+    return { success: true, message: 'Student updated successfully' }
+  }
+  return { success: false, message: data.message }
+}
+
+export const deleteStudent = async (studentId) => {
+  if (config.USE_MOCK) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { success: true, message: 'Student deleted successfully' }
+  }
+
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/students/${studentId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  const data = await response.json()
+  if (response.ok) {
+    return { success: true, message: 'Student deleted successfully' }
+  }
+  return { success: false, message: data.message }
+}

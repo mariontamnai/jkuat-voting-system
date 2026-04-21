@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import { getStudents, addStudent } from '../../services/adminService';
+import { getStudents, addStudent, updateStudent, deleteStudent } from '../../services/adminService';
 
 const Students = () => {
   const navigate = useNavigate();
@@ -19,6 +19,9 @@ const Students = () => {
     email: '',
     regNo: '',
   });
+  const [editingStudent, setEditingStudent] = useState(null);
+  const [editForm, setEditForm] = useState({ name: '' });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const studentsPerPage = 10;
 
   const admin = JSON.parse(sessionStorage.getItem('admin'));
@@ -61,6 +64,34 @@ const Students = () => {
     }
   };
 
+  const handleEditStudent = async (studentId) => {
+    if (!editForm.name) {
+      showMessage('Please enter a name', 'error');
+      return;
+    }
+    const result = await updateStudent(studentId, { name: editForm.name });
+    if (result.success) {
+      showMessage('Student updated successfully!', 'success');
+      setStudents(prev => prev.map(s =>
+        s.id === studentId ? { ...s, name: editForm.name } : s
+      ));
+      setEditingStudent(null);
+    } else {
+      showMessage('Failed to update student', 'error');
+    }
+  };
+
+  const handleDeleteStudent = async (studentId) => {
+    const result = await deleteStudent(studentId);
+    if (result.success) {
+      showMessage('Student deleted successfully!', 'success');
+      setStudents(prev => prev.filter(s => s.id !== studentId));
+      setShowDeleteConfirm(null);
+    } else {
+      showMessage('Failed to delete student', 'error');
+    }
+  };
+
   const filteredStudents = students
     .filter(s => {
       if (filter === 'voted') return s.hasVoted === true;
@@ -68,8 +99,8 @@ const Students = () => {
       return true;
     })
     .filter(s =>
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.regNo.toLowerCase().includes(searchTerm.toLowerCase())
+      s.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.regNo?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
@@ -155,7 +186,7 @@ const Students = () => {
                   <input
                     type="text"
                     className="form-input"
-                    placeholder=" Search by name or reg number..."
+                    placeholder="🔍 Search by name or reg number..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -190,20 +221,91 @@ const Students = () => {
                   ) : (
                     <>
                       <div className="students-table">
-                        <div className="students-table-header">
+                        <div className="students-table-header" style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr' }}>
                           <span>Name</span>
                           <span>Reg No</span>
                           <span>Year</span>
                           <span>Voted</span>
+                          <span>Actions</span>
                         </div>
                         {paginatedStudents.map((student, index) => (
-                          <div key={index} className="students-table-row">
-                            <span>{student.name}</span>
-                            <span>{student.regNo}</span>
-                            <span>{student.year}</span>
-                            <span className={student.hasVoted ? 'voted-yes' : 'voted-no'}>
-                              {student.hasVoted ? '✓' : '✗'}
-                            </span>
+                          <div key={index}>
+                            {editingStudent === student.id ? (
+                              <div className="students-table-row edit-row" style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr' }}>
+                                <input
+                                  type="text"
+                                  className="form-input"
+                                  value={editForm.name}
+                                  onChange={(e) => setEditForm({ name: e.target.value })}
+                                  style={{ padding: '6px', fontSize: '0.85rem' }}
+                                />
+                                <span>{student.regNo}</span>
+                                <span>{student.year}</span>
+                                <span className={student.hasVoted ? 'voted-yes' : 'voted-no'}>
+                                  {student.hasVoted ? '✓' : '✗'}
+                                </span>
+                                <div className="action-btns">
+                                  <button
+                                    className="action-btn save-btn"
+                                    onClick={() => handleEditStudent(student.id)}
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    className="action-btn cancel-btn"
+                                    onClick={() => setEditingStudent(null)}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="students-table-row" style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr' }}>
+                                <span>{student.name}</span>
+                                <span>{student.regNo}</span>
+                                <span>{student.year}</span>
+                                <span className={student.hasVoted ? 'voted-yes' : 'voted-no'}>
+                                  {student.hasVoted ? '✓' : '✗'}
+                                </span>
+                                <div className="action-btns">
+                                  <button
+                                    className="action-btn edit-btn"
+                                    onClick={() => {
+                                      setEditingStudent(student.id);
+                                      setEditForm({ name: student.name });
+                                    }}
+                                  >
+                                    ✏️
+                                  </button>
+                                  <button
+                                    className="action-btn delete-btn"
+                                    onClick={() => setShowDeleteConfirm(student.id)}
+                                  >
+                                    🗑️
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {showDeleteConfirm === student.id && (
+                              <div className="delete-confirm">
+                                <p>Delete <strong>{student.name}</strong>?</p>
+                                <div className="action-btns">
+                                  <button
+                                    className="action-btn delete-btn"
+                                    onClick={() => handleDeleteStudent(student.id)}
+                                  >
+                                    Yes, Delete
+                                  </button>
+                                  <button
+                                    className="action-btn cancel-btn"
+                                    onClick={() => setShowDeleteConfirm(null)}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
