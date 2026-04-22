@@ -3,58 +3,86 @@ import { mockUser, mockAdmin } from '../mock/user';
 
 export const loginStudent = async (regNo, password) => {
   if (config.USE_MOCK) {
-    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
     if (regNo === mockUser.regNo && password === 'password123') {
-      return { success: true, user: mockUser }
+      return { success: true, user: mockUser, token: 'MOCK-TOKEN' }
     }
     return { success: false, message: 'Invalid credentials' }
   }
 
-  const response = await fetch(`${config.API_URL}/api/students/login`, {
+  const response = await fetch(`${config.API_URL}/api/auth/student/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ regNo, password })
+    body: JSON.stringify({ regNumber: regNo, password })
   })
-  return response.json()
+  const data = await response.json()
+  if (data.token) {
+    return {
+      success: true,
+      token: data.token,
+      user: {
+        id: data.studentId,
+        name: data.fullName,
+        regNo,
+        hasVoted: false,
+        role: 'student'
+      }
+    }
+  }
+  return { success: false, message: data.message || 'Invalid credentials' }
 }
 
 export const loginAdmin = async (adminId, password) => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 1000));
-
     if (adminId === mockAdmin.adminId && password === 'admin123') {
-      return { success: true, user: mockAdmin }
+      return { success: true, user: mockAdmin, token: 'MOCK-ADMIN-TOKEN' }
     }
     return { success: false, message: 'Invalid credentials' }
   }
 
-  const response = await fetch(`${config.API_URL}/api/admin/login`, {
+  const response = await fetch(`${config.API_URL}/api/auth/admin/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ adminId, password })
+    body: JSON.stringify({ regNumber: adminId, password })
   })
-  return response.json()
+  const data = await response.json()
+  if (data.token) {
+    return {
+      success: true,
+      token: data.token,
+      user: {
+        id: data.adminId,
+        name: data.fullName,
+        adminId,
+        role: data.role
+      }
+    }
+  }
+  return { success: false, message: data.message || 'Invalid credentials' }
 }
 
 export const verifyFace = async (imageBlob, studentId) => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 2000));
-    // In mock mode — always pass if blob exists
     if (imageBlob) {
       return { success: true, verified: true, token: 'TOKEN-' + Date.now() }
     }
     return { success: false, verified: false, message: 'No face detected' }
   }
 
-  const formData = new FormData()
-  formData.append('face_image', imageBlob, 'face.jpg')
-  formData.append('student_id', studentId)
-
-  const response = await fetch(`${config.API_URL}/api/students/verify-face`, {
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/student/verify-face`, {
     method: 'POST',
-    body: formData
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ faceDescriptor: studentId })
   })
-  return response.json()
+  const data = await response.json()
+  if (data.verified) {
+    return { success: true, verified: true, token: data.token }
+  }
+  return { success: false, verified: false, message: data.message }
 }

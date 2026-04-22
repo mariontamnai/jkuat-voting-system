@@ -24,6 +24,7 @@ const AdminLogin = () => {
 
     if (result.success) {
       sessionStorage.setItem('admin', JSON.stringify(result.user));
+      sessionStorage.setItem('token', result.token);
       navigate('/admin/dashboard');
     } else {
       setError(result.message || 'Invalid credentials');

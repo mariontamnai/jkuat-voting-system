@@ -23,8 +23,8 @@ const StudentLogin = () => {
     const result = await loginStudent(regNo, password);
 
     if (result.success) {
-      // Save user to session storage
       sessionStorage.setItem('user', JSON.stringify(result.user));
+      sessionStorage.setItem('token', result.token);
       navigate('/face-recognition');
     } else {
       setError(result.message || 'Invalid credentials');
