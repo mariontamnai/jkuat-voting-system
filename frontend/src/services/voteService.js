@@ -8,8 +8,23 @@ export const getCandidates = async () => {
     return { success: true, candidates: mockCandidates }
   }
 
-  const response = await fetch(`${config.API_URL}/api/candidates`)
-  return response.json()
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/student/active-election`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  const data = await response.json()
+  if (response.ok) {
+    return {
+      success: true,
+      candidates: data.candidates.map(c => ({
+        id: c._id,
+        name: c.name,
+        faculty: c.position,
+        year: c.party
+      }))
+    }
+  }
+  return { success: false, message: data.message }
 }
 
 export const castVote = async (candidateId, studentId, token) => {
@@ -18,15 +33,20 @@ export const castVote = async (candidateId, studentId, token) => {
     return { success: true, message: 'Vote cast successfully' }
   }
 
-  const response = await fetch(`${config.API_URL}/api/votes/cast`, {
+  const votingToken = sessionStorage.getItem('votingToken');
+  const response = await fetch(`${config.API_URL}/api/vote`, {
     method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ candidateId, studentId })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      token: votingToken,
+      candidateId
+    })
   })
-  return response.json()
+  const data = await response.json()
+  if (response.ok) {
+    return { success: true, message: data.message }
+  }
+  return { success: false, message: data.message }
 }
 
 export const getResults = async () => {
@@ -35,6 +55,13 @@ export const getResults = async () => {
     return { success: true, results: getMockResults() }
   }
 
-  const response = await fetch(`${config.API_URL}/api/results`)
-  return response.json()
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/results`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  const data = await response.json()
+  if (response.ok) {
+    return { success: true, results: data }
+  }
+  return { success: false, message: data.message }
 }
