@@ -56,12 +56,30 @@ export const getResults = async () => {
   }
 
   const token = sessionStorage.getItem('token');
-  const response = await fetch(`${config.API_URL}/api/admin/results`, {
+  const electionId = sessionStorage.getItem('electionId');
+  const response = await fetch(`${config.API_URL}/api/admin/elections/${electionId}/results`, {
     headers: { 'Authorization': `Bearer ${token}` }
   })
   const data = await response.json()
   if (response.ok) {
-    return { success: true, results: data }
+    return {
+      success: true,
+      results: {
+        totalVotes: data.totalVotes,
+        eligibleVoters: 2000,
+        turnout: parseFloat(((data.totalVotes / 2000) * 100).toFixed(1)),
+        candidates: data.results.map(c => ({
+          id: c._id,
+          name: c.name,
+          faculty: c.position,
+          party: c.party,
+          votes: c.voteCount,
+          percentage: data.totalVotes > 0 
+            ? parseFloat(((c.voteCount / data.totalVotes) * 100).toFixed(1)) 
+            : 0
+        })).sort((a, b) => b.votes - a.votes)
+      }
+    }
   }
   return { success: false, message: data.message }
 }
