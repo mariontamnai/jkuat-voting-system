@@ -19,6 +19,39 @@ export const getAdminStats = async (phase) => {
   return { success: false, message: data.message }
 }
 
+export const getElections = async () => {
+  if (config.USE_MOCK) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return {
+      success: true,
+      elections: [
+        { id: '69df74ee57baca2277b339fb', title: 'University Sports Director', status: 'active' },
+        { id: '69df744457baca2277b339f6', title: 'Arts and Humanities', status: 'active' },
+        { id: '69df743557baca2277b339f1', title: 'Computer Science Governor', status: 'active' },
+        { id: '69df742657baca2277b339ec', title: 'School of Engineering Rep', status: 'active' },
+        { id: '69df73e957baca2277b339e7', title: 'University President', status: 'active' },
+      ]
+    }
+  }
+
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/elections`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  const data = await response.json()
+  if (response.ok) {
+    return {
+      success: true,
+      elections: data.map(e => ({
+        id: e._id,
+        title: e.title,
+        status: e.status
+      }))
+    }
+  }
+  return { success: false, message: data.message }
+}
+
 export const getStudents = async () => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -72,14 +105,18 @@ export const addStudent = async (studentData) => {
   })
   const data = await response.json()
   if (response.ok) {
-    return { success: true, message: data.message, student: {
-      id: data._id,
-      name: data.fullName,
-      regNo: data.regNumber,
-      year: data.year,
-      email: data.email,
-      hasVoted: false
-    }}
+    return {
+      success: true,
+      message: data.message,
+      student: {
+        id: data._id,
+        name: data.fullName,
+        regNo: data.regNumber,
+        year: data.year,
+        email: data.email,
+        hasVoted: false
+      }
+    }
   }
   return { success: false, message: data.message }
 }

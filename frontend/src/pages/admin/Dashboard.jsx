@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import { getAdminStats, startSession, endSession, publishResults } from '../../services/adminService';
+import { getAdminStats, getElections, startSession, endSession, publishResults } from '../../services/adminService';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [elections, setElections] = useState([]);
+  const [selectedElection, setSelectedElection] = useState(sessionStorage.getItem('electionId') || '');
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -20,6 +22,7 @@ const Dashboard = () => {
       return;
     }
     loadStats();
+    loadElections();
   }, []);
 
   useEffect(() => {
@@ -31,6 +34,13 @@ const Dashboard = () => {
     }
     return () => clearInterval(interval);
   }, [phase]);
+
+  const loadElections = async () => {
+    const result = await getElections();
+    if (result.success) {
+      setElections(result.elections);
+    }
+  };
 
   const loadStats = async () => {
     const result = await getAdminStats(phase);
@@ -124,23 +134,43 @@ const Dashboard = () => {
                 )}
 
                 <div className="stats-grid">
-  <div className="stat-box">
-    <h3>{stats?.totalStudents}</h3>
-    <p>STUDENTS</p>
-  </div>
-  <div className="stat-box">
-    <h3>{stats?.totalVotes}</h3>
-    <p>VOTES</p>
-  </div>
-  <div className="stat-box">
-    <h3>{stats?.totalElections}</h3>
-    <p>ELECTIONS</p>
-  </div>
-  <div className="stat-box">
-    <h3>{stats?.activeElections}</h3>
-    <p>ACTIVE</p>
-  </div>
-</div>
+                  <div className="stat-box">
+                    <h3>{stats?.totalStudents}</h3>
+                    <p>STUDENTS</p>
+                  </div>
+                  <div className="stat-box">
+                    <h3>{stats?.totalVotes}</h3>
+                    <p>VOTES</p>
+                  </div>
+                  <div className="stat-box">
+                    <h3>{stats?.totalElections}</h3>
+                    <p>ELECTIONS</p>
+                  </div>
+                  <div className="stat-box">
+                    <h3>{stats?.activeElections}</h3>
+                    <p>ACTIVE</p>
+                  </div>
+                </div>
+
+                <div className="admin-section">
+                  <h3 className="admin-section-title">Select Election</h3>
+                  <select
+                    className="form-input"
+                    value={selectedElection}
+                    onChange={(e) => {
+                      setSelectedElection(e.target.value);
+                      sessionStorage.setItem('electionId', e.target.value);
+                    }}
+                    disabled={phase !== 'idle'}
+                  >
+                    <option value="">-- Select an election --</option>
+                    {elections.map(election => (
+                      <option key={election.id} value={election.id}>
+                        {election.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <div className="admin-section">
                   <h3 className="admin-section-title">Voting</h3>
@@ -148,7 +178,7 @@ const Dashboard = () => {
                     <button
                       className="btn btn-primary"
                       onClick={handleStartSession}
-                      disabled={phase !== 'idle'}
+                      disabled={phase !== 'idle' || !selectedElection}
                     >
                       START SESSION
                     </button>
