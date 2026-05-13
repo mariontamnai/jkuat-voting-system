@@ -36,19 +36,27 @@ const Dashboard = () => {
   }, [phase]);
 
   const loadElections = async () => {
+  try {
     const result = await getElections();
     if (result.success) {
       setElections(result.elections);
     }
-  };
+  } catch (err) {
+    console.error('Elections error:', err);
+  }
+};
 
   const loadStats = async () => {
+  try {
     const result = await getAdminStats(phase);
     if (result.success) {
       setStats(result.stats);
     }
-    setLoading(false);
-  };
+  } catch (err) {
+    console.error('Stats error:', err);
+  }
+  setLoading(false);
+};
 
   const showMessage = (msg, type) => {
     setMessage(msg);

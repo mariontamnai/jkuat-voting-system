@@ -52,8 +52,8 @@ export const loginAdmin = async (adminId, password) => {
       success: true,
       token: data.token,
       user: {
-        id: data.adminId,
-        name: data.fullName,
+        id: data.adminId ,
+        name: 'Admin User',
         adminId,
         role: data.role
       }
@@ -62,10 +62,10 @@ export const loginAdmin = async (adminId, password) => {
   return { success: false, message: data.message || 'Invalid credentials' }
 }
 
-export const verifyFace = async (imageBlob, studentId) => {
+export const verifyFace = async (faceDescriptor, studentId) => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 2000));
-    if (imageBlob) {
+    if (faceDescriptor) {
       return { success: true, verified: true, token: 'TOKEN-' + Date.now() }
     }
     return { success: false, verified: false, message: 'No face detected' }
@@ -78,7 +78,7 @@ export const verifyFace = async (imageBlob, studentId) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({ faceDescriptor: studentId })
+    body: JSON.stringify({ faceDescriptor: faceDescriptor })
   })
   const data = await response.json()
   if (data.verified) {

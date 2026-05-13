@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as faceapi from 'face-api.js';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { verifyFace } from '../services/authService';
 
 const FaceRecognition = () => {
   const navigate = useNavigate();
-  const [faceStatus, setFaceStatus] = useState('Initializing...');
+  const [faceStatus, setFaceStatus] = useState('Loading face detection models...');
   const [cameraReady, setCameraReady] = useState(false);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
@@ -18,6 +20,12 @@ const FaceRecognition = () => {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const detectionRef = useRef(null);
+  const modelsLoadedRef = useRef(false);
+
+  const detectorOptions = new faceapi.TinyFaceDetectorOptions({
+    inputSize: 416,
+    scoreThreshold: 0.3,
+  });
 
   const user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -26,86 +34,92 @@ const FaceRecognition = () => {
       navigate('/student-login');
       return;
     }
-    initializeCamera();
+    loadModels();
     return () => {
       cleanUpCamera();
       if (detectionRef.current) clearInterval(detectionRef.current);
     };
   }, []);
 
+  const loadModels = async () => {
+    try {
+      setFaceStatus('Loading face detection models...');
+      const MODEL_URL = '/models';
+      await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+      ]);
+
+      modelsLoadedRef.current = true;
+      setModelsLoaded(true);
+      setFaceStatus('Models loaded — Starting camera...');
+      initializeCamera();
+    } catch (err) {
+      console.error('Model loading error:', err);
+      setError('Failed to load face detection models. Please refresh.');
+      setFaceStatus('Model loading failed');
+    }
+  };
+
   const initializeCamera = async () => {
     try {
-      setFaceStatus('Accessing camera...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }
       });
-
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
-        setCameraReady(true);
-        setFaceStatus('Camera ready — Position your face in the oval');
-        startFaceDetection();
+        videoRef.current.onloadedmetadata = () => {
+          setCameraReady(true);
+          setFaceStatus('Camera ready — Position your face in the oval');
+          startFaceDetection();
+        };
       }
     } catch (err) {
+      console.error('Camera error:', err);
       setError('Camera access denied. Please enable camera permissions.');
       setFaceStatus('Camera error');
     }
   };
 
   const startFaceDetection = () => {
-    detectionRef.current = setInterval(() => {
-      if (!videoRef.current || !canvasRef.current) return;
+    detectionRef.current = setInterval(async () => {
+      if (!videoRef.current || !modelsLoadedRef.current) return;
+      try {
+        const detection = await faceapi
+          .detectSingleFace(videoRef.current, detectorOptions)
+          .withFaceLandmarks();
 
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-
-      canvas.width = video.videoWidth || 320;
-      canvas.height = video.videoHeight || 240;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      const imageData = ctx.getImageData(
-        canvas.width * 0.25,
-        canvas.height * 0.1,
-        canvas.width * 0.5,
-        canvas.height * 0.8
-      );
-
-      const detected = hasSkinTone(imageData.data);
-      setFaceDetected(detected);
-
-      if (detected) {
-        setFaceStatus('Face detected ✓ — Click Verify Identity');
-      } else {
-        setFaceStatus('No face detected — Position your face in the oval');
+        if (detection) {
+          setFaceDetected(true);
+          setFaceStatus('Face detected ✓ — Click Verify Identity');
+        } else {
+          setFaceDetected(false);
+          setFaceStatus('No face detected — Position your face in the oval');
+        }
+      } catch (err) {
+        console.error('Detection error:', err);
       }
     }, 500);
   };
 
-  
-  const hasSkinTone = (pixels) => {
-    let skinPixels = 0;
-    const totalPixels = pixels.length / 4;
+  const getFaceDescriptor = async () => {
+    if (!videoRef.current) return null;
+    try {
+      const detection = await faceapi
+        .detectSingleFace(videoRef.current, detectorOptions)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
-    for (let i = 0; i < pixels.length; i += 4) {
-      const r = pixels[i];
-      const g = pixels[i + 1];
-      const b = pixels[i + 2];
-
-      
-      if (
-        r > 60 && g > 40 && b > 20 &&
-        r > g && r > b &&
-        Math.abs(r - g) > 10 &&
-        r - b > 10
-      ) {
-        skinPixels++;
+      if (detection) {
+        return Array.from(detection.descriptor);
       }
+      return null;
+    } catch (err) {
+      console.error('Descriptor error:', err);
+      return null;
     }
-
-    const skinRatio = skinPixels / totalPixels;
-    return skinRatio > 0.08; 
   };
 
   const cleanUpCamera = () => {
@@ -115,56 +129,47 @@ const FaceRecognition = () => {
     }
   };
 
-  const captureFaceImage = () => {
-    if (!videoRef.current || !canvasRef.current) return null;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.95);
-    });
-  };
-
   const handleVerify = async () => {
     if (!faceDetected) {
       const newCount = attemptCount + 1;
       setAttemptCount(newCount);
       setError(`No face detected. Attempt ${newCount} of 3`);
-
       if (newCount >= 3) {
         setError('Maximum attempts reached. Returning home in 30 seconds...');
-        start30SecondTimer();
+        startTimer();
       }
       return;
     }
 
     setLoading(true);
     setError('');
-    setFaceStatus('Verifying...');
+    setFaceStatus('Extracting face descriptor...');
 
     try {
-      const imageBlob = await captureFaceImage();
-      const result = await verifyFace(imageBlob, user?.regNo);
+      const descriptor = await getFaceDescriptor();
+
+      if (!descriptor) {
+        handleFailedAttempt();
+        return;
+      }
+
+      setFaceStatus('Verifying identity...');
+      const result = await verifyFace(descriptor, user?.regNo);
 
       if (result.success && result.verified) {
         setFaceStatus('Face verified successfully! ✓');
         if (detectionRef.current) clearInterval(detectionRef.current);
-
         setTimeout(() => {
           cleanUpCamera();
           sessionStorage.setItem('token', result.token);
+          sessionStorage.setItem('votingToken', result.token);
           navigate('/vote');
         }, 1500);
       } else {
         handleFailedAttempt();
       }
     } catch (err) {
+      console.error('Verify error:', err);
       setError('An error occurred. Please try again.');
       setFaceStatus('Error occurred');
     }
@@ -177,10 +182,9 @@ const FaceRecognition = () => {
     setAttemptCount(newCount);
     setFaceStatus('Verification failed');
     setError(`Verification failed. Attempt ${newCount} of 3`);
-
     if (newCount >= 3) {
       setError('Maximum attempts reached. Returning home in 30 seconds...');
-      start30SecondTimer();
+      startTimer();
     } else {
       setTimeout(() => {
         setFaceStatus('Ready to retry — position your face in the oval');
@@ -189,7 +193,7 @@ const FaceRecognition = () => {
     }
   };
 
-  const start30SecondTimer = () => {
+  const startTimer = () => {
     let timeLeft = 30;
     setRetryTimer(timeLeft);
     const interval = setInterval(() => {
@@ -245,9 +249,15 @@ const FaceRecognition = () => {
               <button
                 className="btn btn-primary"
                 onClick={handleVerify}
-                disabled={!cameraReady || loading || retryTimer !== null}
+                disabled={!cameraReady || !modelsLoaded || loading || retryTimer !== null}
               >
-                {loading ? 'VERIFYING...' : cameraReady ? 'VERIFY IDENTITY' : 'INITIALIZING CAMERA...'}
+                {!modelsLoaded
+                  ? 'LOADING MODELS...'
+                  : loading
+                  ? 'VERIFYING...'
+                  : cameraReady
+                  ? 'VERIFY IDENTITY'
+                  : 'INITIALIZING CAMERA...'}
               </button>
 
               <p className="cancel-note">Cancelling will log you out of the voting session</p>

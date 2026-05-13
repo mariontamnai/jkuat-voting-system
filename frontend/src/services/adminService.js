@@ -2,6 +2,10 @@ import config from '../config';
 import { getMockAdminStats, mockStudents } from '../mock/admin';
 import { startMockSession, endMockSession } from '../mock/results';
 
+const authHeaders = (token) => ({
+  'Authorization': `Bearer ${token}`
+})
+
 export const getAdminStats = async (phase) => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -9,8 +13,9 @@ export const getAdminStats = async (phase) => {
   }
 
   const token = sessionStorage.getItem('token');
+  console.log('token in getAdminStats:', token);
   const response = await fetch(`${config.API_URL}/api/admin/dashboard`, {
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: authHeaders(token)
   })
   const data = await response.json()
   if (response.ok) {
@@ -36,7 +41,7 @@ export const getElections = async () => {
 
   const token = sessionStorage.getItem('token');
   const response = await fetch(`${config.API_URL}/api/admin/elections`, {
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: authHeaders(token)
   })
   const data = await response.json()
   if (response.ok) {
@@ -60,7 +65,7 @@ export const getStudents = async () => {
 
   const token = sessionStorage.getItem('token');
   const response = await fetch(`${config.API_URL}/api/admin/students`, {
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: authHeaders(token)
   })
   const data = await response.json()
   if (response.ok) {
@@ -93,14 +98,17 @@ export const addStudent = async (studentData) => {
   const response = await fetch(`${config.API_URL}/api/admin/students`, {
     method: 'POST',
     headers: {
+      ...authHeaders(token),
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({
       regNumber: studentData.regNo,
       fullName: studentData.name,
       email: studentData.email,
-      year: studentData.year
+      year: studentData.year,
+      course: studentData.course,
+      password: studentData.password,
+      faceDescriptor: studentData.faceDescriptor
     })
   })
   const data = await response.json()
@@ -131,8 +139,8 @@ export const updateStudent = async (studentId, studentData) => {
   const response = await fetch(`${config.API_URL}/api/admin/students/${studentId}`, {
     method: 'PUT',
     headers: {
+      ...authHeaders(token),
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({ fullName: studentData.name })
   })
@@ -152,7 +160,7 @@ export const deleteStudent = async (studentId) => {
   const token = sessionStorage.getItem('token');
   const response = await fetch(`${config.API_URL}/api/admin/students/${studentId}`, {
     method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: authHeaders(token)
   })
   const data = await response.json()
   if (response.ok) {
@@ -173,8 +181,8 @@ export const startSession = async () => {
   const response = await fetch(`${config.API_URL}/api/admin/elections/${electionId}/status`, {
     method: 'PUT',
     headers: {
+      ...authHeaders(token),
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({ status: 'active' })
   })
@@ -197,8 +205,8 @@ export const endSession = async () => {
   const response = await fetch(`${config.API_URL}/api/admin/elections/${electionId}/status`, {
     method: 'PUT',
     headers: {
+      ...authHeaders(token),
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({ status: 'completed' })
   })
@@ -220,8 +228,8 @@ export const publishResults = async () => {
   const response = await fetch(`${config.API_URL}/api/admin/elections/${electionId}/status`, {
     method: 'PUT',
     headers: {
+      ...authHeaders(token),
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({ status: 'completed' })
   })

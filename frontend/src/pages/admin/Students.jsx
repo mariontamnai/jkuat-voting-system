@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as faceapi from 'face-api.js';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { getStudents, addStudent, updateStudent, deleteStudent } from '../../services/adminService';
 
 const Students = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [faceDetectedAdmin, setFaceDetectedAdmin] = useState(false);
+  const detectionRef = useRef(null);
+  const modelsLoadedRef = useRef(false);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [faceDescriptor, setFaceDescriptor] = useState(null);
+  const [faceCaptured, setFaceCaptured] = useState(false);
+  const [capturing, setCapturing] = useState(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -18,11 +30,18 @@ const Students = () => {
     year: '',
     email: '',
     regNo: '',
+    course: '',
+    password: '',
   });
   const [editingStudent, setEditingStudent] = useState(null);
   const [editForm, setEditForm] = useState({ name: '' });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const studentsPerPage = 10;
+
+  const detectorOptions = new faceapi.TinyFaceDetectorOptions({
+    inputSize: 416,
+    scoreThreshold: 0.3,
+  });
 
   const admin = JSON.parse(sessionStorage.getItem('admin'));
 
@@ -49,16 +68,131 @@ const Students = () => {
     setTimeout(() => setMessage(''), 5000);
   };
 
+  const loadModels = async () => {
+    const MODEL_URL = '/models';
+    await Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+      faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+    ]);
+    modelsLoadedRef.current = true;
+    setModelsLoaded(true);
+  };
+
+  const openCamera = async () => {
+    try {
+      if (!modelsLoadedRef.current) {
+        showMessage('Loading face detection models...', 'success');
+        await loadModels();
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }
+      });
+      setCameraOpen(true);
+      setFaceCaptured(false);
+      setFaceDescriptor(null);
+      setFaceDetectedAdmin(false);
+
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          streamRef.current = stream;
+          videoRef.current.onloadedmetadata = () => {
+            startFaceDetection();
+          };
+        }
+      }, 100);
+    } catch (err) {
+      showMessage('Camera access denied', 'error');
+    }
+  };
+
+  const startFaceDetection = () => {
+    detectionRef.current = setInterval(async () => {
+      if (!videoRef.current || !modelsLoadedRef.current) return;
+      try {
+        const detection = await faceapi
+          .detectSingleFace(videoRef.current, detectorOptions)
+          .withFaceLandmarks();
+        setFaceDetectedAdmin(!!detection);
+      } catch (err) {
+        console.error('Detection error:', err);
+      }
+    }, 500);
+  };
+
+  const closeCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (detectionRef.current) {
+      clearInterval(detectionRef.current);
+      detectionRef.current = null;
+    }
+    setCameraOpen(false);
+    setFaceDetectedAdmin(false);
+  };
+
+  const captureFace = async () => {
+    if (!videoRef.current) {
+      showMessage('Camera not ready. Please try again.', 'error');
+      return;
+    }
+
+    setCapturing(true);
+    showMessage('Detecting face...', 'success');
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const detection = await faceapi
+        .detectSingleFace(videoRef.current, detectorOptions)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (detection) {
+        const descriptor = Array.from(detection.descriptor);
+        setFaceDescriptor(descriptor);
+        setFaceCaptured(true);
+        showMessage('Face captured successfully!', 'success');
+        closeCamera();
+      } else {
+        showMessage('No face detected. Make sure your face is clearly visible and try again.', 'error');
+      }
+    } catch (err) {
+      showMessage('Face capture failed. Please try again.', 'error');
+      console.error('Capture error:', err);
+    }
+    setCapturing(false);
+  };
+
   const handleAddStudent = async () => {
-    if (!studentForm.name || !studentForm.year || !studentForm.email || !studentForm.regNo) {
+    if (
+      !studentForm.name ||
+      !studentForm.year ||
+      !studentForm.email ||
+      !studentForm.regNo ||
+      !studentForm.course ||
+      !studentForm.password
+    ) {
       showMessage('Please fill in all fields', 'error');
       return;
     }
-    const result = await addStudent(studentForm);
+    if (!faceDescriptor) {
+      showMessage('Please capture student face first', 'error');
+      return;
+    }
+
+     console.log("REGISTERING WITH PASSWORD:", studentForm.password);
+     
+    const result = await addStudent({ ...studentForm, faceDescriptor });
     if (result.success) {
       showMessage('Student added successfully!', 'success');
       setStudents(prev => [...prev, result.student]);
-      setStudentForm({ name: '', year: '', email: '', regNo: '' });
+      setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
+      setFaceDescriptor(null);
+      setFaceCaptured(false);
     } else {
       showMessage('Failed to add student', 'error');
     }
@@ -133,6 +267,7 @@ const Students = () => {
 
             <div className="admin-section">
               <h3 className="admin-section-title">Add New Student</h3>
+
               <div className="form-group">
                 <input
                   type="text"
@@ -142,6 +277,7 @@ const Students = () => {
                   onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
                 />
               </div>
+
               <div className="form-group">
                 <input
                   type="text"
@@ -151,6 +287,7 @@ const Students = () => {
                   onChange={(e) => setStudentForm({ ...studentForm, year: e.target.value })}
                 />
               </div>
+
               <div className="form-group">
                 <input
                   type="email"
@@ -160,15 +297,120 @@ const Students = () => {
                   onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
                 />
               </div>
+
               <div className="form-group">
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Registration Number e.g., SCT111-0111/1900"
+                  placeholder="Reg No e.g., SCT111-0111/1900"
                   value={studentForm.regNo}
                   onChange={(e) => setStudentForm({ ...studentForm, regNo: e.target.value })}
                 />
               </div>
+
+              {/* NEW: Course field */}
+              <div className="form-group">
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Course (e.g. BSc Computer Science)"
+                  value={studentForm.course}
+                  onChange={(e) => setStudentForm({ ...studentForm, course: e.target.value })}
+                />
+              </div>
+
+              {/* NEW: Password field */}
+<div className="form-group">
+  <div className="input-wrapper">
+    <input
+      type={showPassword ? 'text' : 'password'}
+      className="form-input"
+      placeholder="Student Login Password"
+      value={studentForm.password}
+      onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
+    />
+    <button
+      type="button"
+      className="eye-btn"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      )}
+    </button>
+  </div>
+</div>
+
+              <div className="form-group">
+                <label className="form-label">STUDENT FACE</label>
+                {!cameraOpen && !faceCaptured && (
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    onClick={openCamera}
+                  >
+                    OPEN CAMERA TO CAPTURE FACE
+                  </button>
+                )}
+
+                {cameraOpen && (
+                  <div className="face-capture-container">
+                    <div className={`camera-status ${faceDetectedAdmin ? 'status-success' : 'status-waiting'}`}>
+                      {faceDetectedAdmin ? 'Face detected ✓ — Click Capture Face' : 'No face detected — Position your face in the oval'}
+                    </div>
+                    <div className="video-container">
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="webcam"
+                      />
+                      <div className={`face-overlay ${faceDetectedAdmin ? 'detected' : ''}`} />
+                    </div>
+                    <div className="button-group" style={{ marginTop: '10px' }}>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={captureFace}
+                        disabled={capturing || !faceDetectedAdmin}
+                      >
+                        {capturing ? 'CAPTURING...' : 'CAPTURE FACE'}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={closeCamera}
+                      >
+                        CANCEL
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {faceCaptured && (
+                  <div className="alert alert-success">
+                    ✅ Face captured successfully! Ready to register.
+                    <button
+                      type="button"
+                      className="back-btn"
+                      onClick={openCamera}
+                      style={{ marginTop: '5px' }}
+                    >
+                      Recapture face
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button className="btn btn-primary" onClick={handleAddStudent}>
                 ADD STUDENT
               </button>

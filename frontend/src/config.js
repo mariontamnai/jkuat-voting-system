@@ -1,6 +1,6 @@
 const config = {
-  USE_MOCK: true, // ← flip to false when backend is ready
-  API_URL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  USE_MOCK: false, 
+  API_URL: '',
 }
 
 export default config;
