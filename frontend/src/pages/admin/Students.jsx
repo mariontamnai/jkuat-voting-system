@@ -254,17 +254,18 @@ const Students = () => {
   };
 
   const handleResetPassword = async (student) => {
-    const result = await updateStudent(student.id, {
-      password: student.regNo,
-      isFirstLogin: true,
-    });
-    if (result.success) {
-      showMessage(`Password reset to reg number for ${student.name}`, 'success');
-      setShowResetConfirm(null);
-    } else {
-      showMessage('Failed to reset password', 'error');
-    }
-  };
+  const tempPassword = Math.random().toString(36).slice(-8).toUpperCase();
+  const result = await updateStudent(student.id, {
+    password: tempPassword,
+    isFirstLogin: true,
+  });
+  if (result.success) {
+    showMessage(`Password reset. Temp password: ${tempPassword} — share with ${student.name} securely`, 'success');
+    setShowResetConfirm(null);
+  } else {
+    showMessage('Failed to reset password', 'error');
+  }
+};
 
   const filteredStudents = students
     .filter(s => {
