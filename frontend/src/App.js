@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-
 import Home from './pages/Home';
 import StudentLogin from './pages/StudentLogin';
 import AdminLogin from './pages/AdminLogin';
@@ -12,6 +11,8 @@ import Results from './pages/Results';
 import Dashboard from './pages/admin/Dashboard';
 import Students from './pages/admin/Students';
 import WinnerAnnouncement from './pages/WinnerAnnouncement';
+import ChangePassword from './pages/ChangePassword';   // 👈 ADD THIS
+
 function App() {
   return (
     <Router>
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/student-login" element={<StudentLogin />} />
         <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/change-password" element={<ChangePassword />} />  {/* 👈 ADD THIS */}
         <Route path="/face-recognition" element={<FaceRecognition />} />
         <Route path="/vote" element={<CastVote />} />
         <Route path="/vote-submitted" element={<VoteSubmitted />} />

@@ -158,11 +158,10 @@ const FaceRecognition = () => {
 
       if (result.success && result.verified) {
         setFaceStatus('Face verified successfully! ✓');
+        sessionStorage.setItem('votingToken', result.token);
         if (detectionRef.current) clearInterval(detectionRef.current);
         setTimeout(() => {
           cleanUpCamera();
-          sessionStorage.setItem('token', result.token);
-          sessionStorage.setItem('votingToken', result.token);
           navigate('/vote');
         }, 1500);
       } else {

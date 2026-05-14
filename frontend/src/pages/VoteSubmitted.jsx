@@ -77,7 +77,10 @@ const VoteSubmitted = () => {
               <button
                 className="btn btn-danger"
                 onClick={() => {
-                  sessionStorage.clear();
+                  sessionStorage.removeItem('token');
+                  sessionStorage.removeItem('votingToken');
+                  sessionStorage.removeItem('user');
+                  sessionStorage.removeItem('votedFor');
                   navigate('/');
                 }}
               >

@@ -27,10 +27,14 @@ const StudentLogin = () => {
     if (result.success) {
       sessionStorage.setItem('user', JSON.stringify(result.user));
       sessionStorage.setItem('token', result.token);
-      navigate('/face-recognition');
-    } else {
-      setError(result.message || 'Invalid credentials');
-    }
+      if (result.user.isFirstLogin) {
+    navigate('/change-password');
+  } else {
+    navigate('/face-recognition');
+  }
+} else {
+  setError(result.message || 'Invalid credentials');
+}
 
     setLoading(false);
   };

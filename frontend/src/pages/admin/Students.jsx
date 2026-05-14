@@ -34,7 +34,8 @@ const Students = () => {
     password: '',
   });
   const [editingStudent, setEditingStudent] = useState(null);
-  const [editForm, setEditForm] = useState({ name: '' });
+  const [editForm, setEditForm] = useState({ name: '', email: '', year: '', course: '', resetPassword: '' });
+  const [showResetConfirm, setShowResetConfirm] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const studentsPerPage = 10;
 
@@ -184,30 +185,56 @@ const Students = () => {
       return;
     }
 
-     console.log("REGISTERING WITH PASSWORD:", studentForm.password);
-     
-    const result = await addStudent({ ...studentForm, faceDescriptor });
-    if (result.success) {
-      showMessage('Student added successfully!', 'success');
-      setStudents(prev => [...prev, result.student]);
-      setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
-      setFaceDescriptor(null);
-      setFaceCaptured(false);
-    } else {
-      showMessage('Failed to add student', 'error');
+    const threshold = 0.45;
+  for (const existing of students) {
+    if (!existing.faceDescriptor) continue;
+    const distance = faceapi.euclideanDistance(
+      faceDescriptor,
+      existing.faceDescriptor
+    );
+    if (distance < threshold) {
+      showMessage(
+        `This face is already registered to ${existing.name} (${existing.regNo}). Each student must use their own face.`,
+        'error'
+      );
+      return;
     }
-  };
+  }
+
+  console.log("REGISTERING WITH PASSWORD:", studentForm.password);
+
+  const result = await addStudent({ ...studentForm, faceDescriptor });
+  if (result.success) {
+    showMessage('Student added successfully!', 'success');
+    setStudents(prev => [...prev, result.student]);
+    setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
+    setFaceDescriptor(null);
+    setFaceCaptured(false);
+  } else {
+    showMessage(result.message ||'Failed to add student', 'error');
+  }
+};
 
   const handleEditStudent = async (studentId) => {
     if (!editForm.name) {
       showMessage('Please enter a name', 'error');
       return;
     }
-    const result = await updateStudent(studentId, { name: editForm.name });
+    const updateData = {
+      name: editForm.name,
+      email: editForm.email,
+      year: editForm.year,
+      course: editForm.course,
+    };
+    if (editForm.resetPassword) {
+      updateData.password = editForm.resetPassword;
+      updateData.isFirstLogin = true;
+    }
+    const result = await updateStudent(studentId, updateData);
     if (result.success) {
       showMessage('Student updated successfully!', 'success');
       setStudents(prev => prev.map(s =>
-        s.id === studentId ? { ...s, name: editForm.name } : s
+        s.id === studentId ? { ...s, ...updateData } : s
       ));
       setEditingStudent(null);
     } else {
@@ -223,6 +250,19 @@ const Students = () => {
       setShowDeleteConfirm(null);
     } else {
       showMessage('Failed to delete student', 'error');
+    }
+  };
+
+  const handleResetPassword = async (student) => {
+    const result = await updateStudent(student.id, {
+      password: student.regNo,
+      isFirstLogin: true,
+    });
+    if (result.success) {
+      showMessage(`Password reset to reg number for ${student.name}`, 'success');
+      setShowResetConfirm(null);
+    } else {
+      showMessage('Failed to reset password', 'error');
     }
   };
 
@@ -308,7 +348,6 @@ const Students = () => {
                 />
               </div>
 
-              {/* NEW: Course field */}
               <div className="form-group">
                 <input
                   type="text"
@@ -319,35 +358,34 @@ const Students = () => {
                 />
               </div>
 
-              {/* NEW: Password field */}
-<div className="form-group">
-  <div className="input-wrapper">
-    <input
-      type={showPassword ? 'text' : 'password'}
-      className="form-input"
-      placeholder="Student Login Password"
-      value={studentForm.password}
-      onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
-    />
-    <button
-      type="button"
-      className="eye-btn"
-      onClick={() => setShowPassword(!showPassword)}
-    >
-      {showPassword ? (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-          <line x1="1" y1="1" x2="23" y2="23"/>
-        </svg>
-      ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
-      )}
-    </button>
-  </div>
-</div>
+              <div className="form-group">
+                <div className="input-wrapper">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="form-input"
+                    placeholder="Student Login Password"
+                    value={studentForm.password}
+                    onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
+                  />
+                  <button
+                    type="button"
+                    className="eye-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
 
               <div className="form-group">
                 <label className="form-label">STUDENT FACE</label>
@@ -470,35 +508,66 @@ const Students = () => {
                           <span>Voted</span>
                           <span>Actions</span>
                         </div>
+
                         {paginatedStudents.map((student, index) => (
                           <div key={index}>
                             {editingStudent === student.id ? (
-                              <div className="students-table-row edit-row" style={{ gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr' }}>
-                                <input
-                                  type="text"
-                                  className="form-input"
-                                  value={editForm.name}
-                                  onChange={(e) => setEditForm({ name: e.target.value })}
-                                  style={{ padding: '6px', fontSize: '0.85rem' }}
-                                />
-                                <span>{student.regNo}</span>
-                                <span>{student.year}</span>
-                                <span className={student.hasVoted ? 'voted-yes' : 'voted-no'}>
-                                  {student.hasVoted ? '✓' : '✗'}
-                                </span>
-                                <div className="action-btns">
-                                  <button
-                                    className="action-btn save-btn"
-                                    onClick={() => handleEditStudent(student.id)}
-                                  >
-                                    Save
-                                  </button>
-                                  <button
-                                    className="action-btn cancel-btn"
-                                    onClick={() => setEditingStudent(null)}
-                                  >
-                                    Cancel
-                                  </button>
+                              <div className="students-table-row edit-row" style={{ gridTemplateColumns: '1fr' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '10px 0' }}>
+                                  <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Full Name"
+                                    value={editForm.name}
+                                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                    style={{ padding: '6px', fontSize: '0.85rem' }}
+                                  />
+                                  <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Year"
+                                    value={editForm.year}
+                                    onChange={(e) => setEditForm({ ...editForm, year: e.target.value })}
+                                    style={{ padding: '6px', fontSize: '0.85rem' }}
+                                  />
+                                  <input
+                                    type="email"
+                                    className="form-input"
+                                    placeholder="Email"
+                                    value={editForm.email}
+                                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                                    style={{ padding: '6px', fontSize: '0.85rem' }}
+                                  />
+                                  <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="Course"
+                                    value={editForm.course}
+                                    onChange={(e) => setEditForm({ ...editForm, course: e.target.value })}
+                                    style={{ padding: '6px', fontSize: '0.85rem' }}
+                                  />
+                                  <input
+                                    type="password"
+                                    className="form-input"
+                                    placeholder="Reset Password (leave blank to keep current)"
+                                    value={editForm.resetPassword}
+                                    onChange={(e) => setEditForm({ ...editForm, resetPassword: e.target.value })}
+                                    style={{ padding: '6px', fontSize: '0.85rem' }}
+                                  />
+                                  <div className="action-btns">
+                                    <button
+                                      className="action-btn save-btn"
+                                      onClick={() => handleEditStudent(student.id)}
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      className="action-btn cancel-btn"
+                                      onClick={() => setEditingStudent(null)}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             ) : (
@@ -512,23 +581,55 @@ const Students = () => {
                                 <div className="action-btns">
                                   <button
                                     className="action-btn edit-btn"
+                                    title="Edit Student"
                                     onClick={() => {
                                       setEditingStudent(student.id);
-                                      setEditForm({ name: student.name });
+                                      setEditForm({
+                                        name: student.name,
+                                        email: student.email || '',
+                                        year: student.year || '',
+                                        course: student.course || '',
+                                        resetPassword: ''
+                                      });
                                     }}
                                   >
-                                    ✏️
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                    </svg>
                                   </button>
+
+                                  <button
+                                    className="action-btn reset-btn"
+                                    title="Reset Password to Reg Number"
+                                    onClick={() => setShowResetConfirm(student.id)}
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M21 2v6h-6"/>
+                                      <path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+                                      <path d="M3 22v-6h6"/>
+                                      <path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+                                    </svg>
+                                  </button>
+
                                   <button
                                     className="action-btn delete-btn"
+                                    title="Delete Student"
                                     onClick={() => setShowDeleteConfirm(student.id)}
                                   >
-                                    🗑️
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="3 6 5 6 21 6"/>
+                                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                      <path d="M10 11v6"/>
+                                      <path d="M14 11v6"/>
+                                      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                    </svg>
                                   </button>
                                 </div>
                               </div>
                             )}
 
+                            {/* ✅ DELETE CONFIRM — inside map */}
                             {showDeleteConfirm === student.id && (
                               <div className="delete-confirm">
                                 <p>Delete <strong>{student.name}</strong>?</p>
@@ -548,7 +649,32 @@ const Students = () => {
                                 </div>
                               </div>
                             )}
-                          </div>
+
+                            {/* ✅ RESET CONFIRM — inside map, student is in scope here */}
+                            {showResetConfirm === student.id && (
+                              <div className="delete-confirm">
+                                <p>Reset <strong>{student.name}</strong>'s password to their reg number?</p>
+                                <p style={{ fontSize: '0.8rem', color: '#888' }}>
+                                  They will be forced to set a new password on next login.
+                                </p>
+                                <div className="action-btns">
+                                  <button
+                                    className="action-btn save-btn"
+                                    onClick={() => handleResetPassword(student)}
+                                  >
+                                    Yes, Reset
+                                  </button>
+                                  <button
+                                    className="action-btn cancel-btn"
+                                    onClick={() => setShowResetConfirm(null)}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                          </div> 
                         ))}
                       </div>
 

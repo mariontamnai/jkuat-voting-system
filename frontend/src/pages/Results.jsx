@@ -43,13 +43,18 @@ const Results = () => {
   }, [sessionEnded]);
 
   const loadResults = async () => {
-    const result = await getResults();
-    if (result.success) {
-      setResults(result.results);
-      setLastUpdated(new Date());
+  const result = await getResults();
+  if (result.success) {
+    setResults(result.results);
+    setLastUpdated(new Date());
+    // check election status from backend
+    if (result.electionStatus === 'completed') {
+      setSessionEnded(true);
+      sessionStorage.setItem('sessionStatus', 'ended');
     }
-    setLoading(false);
-  };
+  }
+  setLoading(false);
+};
 
   const formatTime = (date) => {
     return date.toLocaleTimeString();
@@ -74,18 +79,18 @@ const Results = () => {
               <div className="loading-text">Loading results...</div>
             ) : (
               <>
-                {results?.candidates[0] && (
-                  <div className="current-leader">
-                    <p className="leader-label">CURRENT LEADER</p>
-                    <h3>{results.candidates[0].name}</h3>
-                    <p>{results.candidates[0].votes} votes ({results.candidates[0].percentage}%)</p>
-                  </div>
-                )}
+                {results?.candidatesByPosition && Object.entries(results.candidatesByPosition).map(([position, candidates]) => (
+  <div key={position} className="current-leader" style={{ marginBottom: '10px' }}>
+    <p className="leader-label">LEADING — {position}</p>
+    <h3>{candidates[0].name}</h3>
+    <p>{candidates[0].votes} votes ({candidates[0].percentage}%)</p>
+  </div>
+))}
 
                 <div className="stats-grid">
                   <div className="stat-box">
                     <h3>{results?.totalVotes}</h3>
-                    <p>TOTAL VOTES</p>
+                    <p>VOTERS PARTICIPATED</p>
                   </div>
                   <div className="stat-box">
                     <h3>{results?.turnout}%</h3>
@@ -99,18 +104,37 @@ const Results = () => {
                 </div>
 
                 <h3 className="section-title">Vote Distribution</h3>
-                <div className="section-divider" />
+<div className="section-divider" />
 
-                <div className="results-list">
-                  {results?.candidates.map((candidate, index) => (
-                    <ResultBar
-                      key={candidate.id}
-                      candidate={candidate}
-                      rank={index + 1}
-                      isLeader={index === 0}
-                    />
-                  ))}
-                </div>
+{results?.candidatesByPosition 
+  ? Object.entries(results.candidatesByPosition).map(([position, candidates]) => (
+    <div key={position} style={{ marginBottom: '20px' }}>
+      <h4 style={{ color: '#2d6a4f', marginBottom: '10px' }}>{position}</h4>
+      <div className="results-list">
+        {candidates.map((candidate, index) => (
+          <ResultBar
+            key={candidate.id}
+            candidate={candidate}
+            rank={index + 1}
+            isLeader={index === 0}
+          />
+        ))}
+      </div>
+    </div>
+  ))
+  : (
+    <div className="results-list">
+      {results?.candidates.map((candidate, index) => (
+        <ResultBar
+          key={candidate.id}
+          candidate={candidate}
+          rank={index + 1}
+          isLeader={index === 0}
+        />
+      ))}
+    </div>
+  )
+}
 
                 <div className="results-footer">
                   <div className="results-footer-row">
@@ -130,32 +154,35 @@ const Results = () => {
                 </div>
 
                 <div className="button-group" style={{ marginTop: '20px' }}>
-                  {admin && (
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => navigate('/admin/dashboard')}
-                    >
-                      BACK TO DASHBOARD
-                    </button>
-                  )}
-                  {!admin && (
-                    <button
-                      className="btn btn-outline"
-                      onClick={() => navigate('/vote')}
-                    >
-                      BACK TO VOTING
-                    </button>
-                  )}
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => {
-                      sessionStorage.clear();
-                      navigate('/');
-                    }}
-                  >
-                    LOGOUT
-                  </button>
-                </div>
+  {admin && (
+    <button
+      className="btn btn-primary"
+      onClick={() => navigate('/admin/dashboard')}
+    >
+      BACK TO DASHBOARD
+    </button>
+  )}
+  {!admin && (
+    <button
+      className="btn btn-outline"
+      onClick={() => navigate('/')}
+    >
+      BACK TO HOME
+    </button>
+  )}
+  <button
+    className="btn btn-danger"
+    onClick={() => {
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('votingToken');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('votedFor');
+      navigate('/');
+    }}
+  >
+    LOGOUT
+  </button>
+</div>
               </>
             )}
           </div>

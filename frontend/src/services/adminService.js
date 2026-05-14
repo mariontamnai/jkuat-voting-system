@@ -77,7 +77,8 @@ export const getStudents = async () => {
         regNo: s.regNumber,
         year: s.year,
         email: s.email,
-        hasVoted: s.hasVoted
+        hasVoted: s.hasVoted,
+        faceDescriptor: s.faceDescriptor
       }))
     }
   }
@@ -122,7 +123,8 @@ export const addStudent = async (studentData) => {
         regNo: data.regNumber,
         year: data.year,
         email: data.email,
-        hasVoted: false
+        hasVoted: false,
+        faceDescriptor: studentData.faceDescriptor
       }
     }
   }
@@ -239,3 +241,63 @@ export const publishResults = async () => {
   }
   return { success: false, message: data.message }
 }
+
+export const createElection = async (electionData) => {
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/elections`, {
+    method: 'POST',
+    headers: {
+      ...authHeaders(token),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(electionData)
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return { success: true, election: data };
+  }
+  return { success: false, message: data.message };
+};
+
+export const addCandidate = async (electionId, candidateData) => {
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/elections/${electionId}/candidates`, {
+    method: 'POST',
+    headers: {
+      ...authHeaders(token),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(candidateData)
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return { success: true, candidate: data };
+  }
+  return { success: false, message: data.message };
+};
+
+export const getCandidates = async (electionId) => {
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/elections`, {
+    headers: authHeaders(token)
+  });
+  const data = await response.json();
+  if (response.ok) {
+    const election = data.find(e => e._id === electionId);
+    return { success: true, candidates: election?.candidates || [] };
+  }
+  return { success: false, message: data.message };
+};
+
+export const resetAllData = async () => {
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/reset`, {
+    method: 'DELETE',
+    headers: authHeaders(token)
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return { success: true, message: data.message };
+  }
+  return { success: false, message: data.message };
+};

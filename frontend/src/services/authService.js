@@ -17,6 +17,7 @@ export const loginStudent = async (regNo, password) => {
   })
   const data = await response.json()
   if (data.token) {
+    sessionStorage.removeItem('votingToken');
     return {
       success: true,
       token: data.token,
@@ -25,7 +26,8 @@ export const loginStudent = async (regNo, password) => {
         name: data.fullName,
         regNo,
         hasVoted: false,
-        role: 'student'
+        role: 'student',
+        isFirstLogin: data.isFirstLogin
       }
     }
   }
@@ -86,3 +88,20 @@ export const verifyFace = async (faceDescriptor, studentId) => {
   }
   return { success: false, verified: false, message: data.message }
 }
+
+export const changePassword = async (newPassword) => {
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/auth/student/change-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ newPassword })
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return { success: true, message: data.message };
+  }
+  return { success: false, message: data.message };
+};

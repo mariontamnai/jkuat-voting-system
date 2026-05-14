@@ -33,6 +33,7 @@ body {
   height: 100px;
   object-fit: contain;
   margin-bottom: 15px;
+  mix-blend-mode: multiply;
 }
 
 .header h1 {
@@ -73,9 +74,10 @@ body {
 }
 
 .card h2 {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 800;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
+  text-align: center;
 }
 
 .description {
@@ -139,14 +141,6 @@ body {
 
 .screen-container {
   padding: 10px 0;
-}
-
-.jkuat-logo-img {
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
-  margin-bottom: 15px;
-  mix-blend-mode: multiply; 
 }
 
 .form-group {
@@ -213,13 +207,6 @@ body {
 .helper-text {
   color: #777;
   font-size: 0.85rem;
-  text-align: center;
-}
-
-.card h2 {
-  font-size: 1.8rem;
-  font-weight: 800;
-  margin-bottom: 25px;
   text-align: center;
 }
 
@@ -524,7 +511,7 @@ body {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 25px;
 }
@@ -689,10 +676,6 @@ body {
   font-weight: 700;
   margin-bottom: 15px;
   color: #333;
-}
-
-.stats-grid {
-  grid-template-columns: 1fr 1fr;
 }
 
 .students-table-container {
@@ -928,110 +911,7 @@ body {
   color: #1b5e20;
 }
 
-@media (max-width: 480px) {
-  .container {
-    padding: 10px;
-  }
-
-  .header h1 {
-    font-size: 1.5rem;
-  }
-
-  .subtitle {
-    font-size: 0.8rem;
-  }
-
-  .jkuat-logo-img {
-    width: 75px;
-    height: 75px;
-  }
-
-  .card {
-    padding: 25px 15px;
-  }
-
-  .card h2 {
-    font-size: 1.4rem;
-  }
-
-  .badges {
-    gap: 6px;
-  }
-
-  .badge {
-    font-size: 0.75rem;
-    padding: 6px 12px;
-  }
-
-  .candidates-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .candidate-card {
-    padding: 15px 10px;
-  }
-
-  .candidate-avatar {
-    width: 45px;
-    height: 45px;
-    font-size: 0.9rem;
-  }
-
-  .candidate-card h3 {
-    font-size: 0.8rem;
-  }
-
-  .candidate-card p {
-    font-size: 0.7rem;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .stat-box h3 {
-    font-size: 1.3rem;
-  }
-
-  .current-leader h3 {
-    font-size: 1.3rem;
-  }
-
-  .result-votes {
-    font-size: 1.2rem;
-  }
-
-  .voter-info-label {
-    font-size: 0.8rem;
-  }
-
-  .voter-info-value {
-    font-size: 0.85rem;
-  }
-
-  .btn {
-    padding: 15px;
-    font-size: 0.9rem;
-  }
-
-  .video-container {
-    max-width: 100%;
-  }
-
-  .face-overlay {
-    width: 160px;
-    height: 210px;
-  }
-
-  .admin-section {
-    padding: 15px;
-  }
-
-  .results-footer-row {
-    font-size: 0.8rem;
-  }
-}
+/* ─── Action Buttons ─────────────────────────────── */
 
 .action-btns {
   display: flex;
@@ -1083,7 +963,11 @@ body {
   align-items: center;
   margin: 5px 0;
   font-size: 0.9rem;
+  flex-wrap: wrap;
+  gap: 8px;
 }
+
+/* ─── Form Extras ─────────────────────────────────── */
 
 select.form-input {
   cursor: pointer;
@@ -1113,4 +997,185 @@ select.form-input {
   padding: 0;
   display: flex;
   align-items: center;
+}
+
+.reset-btn {
+  background: rgba(255, 165, 0, 0.15);
+  color: orange;
+  border: 1px solid rgba(255, 165, 0, 0.3);
+}
+
+.reset-btn:hover {
+  background: rgba(255, 165, 0, 0.3);
+}
+
+/* ─── Mobile Responsive ───────────────────────────── */
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  /* Header */
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .jkuat-logo-img {
+    width: 75px;
+    height: 75px;
+  }
+
+  /* Card */
+  .card {
+    padding: 25px 15px;
+  }
+
+  .card h2 {
+    font-size: 1.4rem;
+  }
+
+  /* Badges */
+  .badges {
+    gap: 6px;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 15px;
+    font-size: 0.9rem;
+  }
+
+  /* Candidates */
+  .candidates-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .candidate-card {
+    padding: 15px 10px;
+  }
+
+  .candidate-avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 0.9rem;
+  }
+
+  .candidate-card h3 {
+    font-size: 0.8rem;
+  }
+
+  .candidate-card p {
+    font-size: 0.7rem;
+  }
+
+  /* Stats */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-box h3 {
+    font-size: 1.3rem;
+  }
+
+  /* Results */
+  .current-leader h3 {
+    font-size: 1.3rem;
+  }
+
+  .result-votes {
+    font-size: 1.2rem;
+  }
+
+  .results-footer-row {
+    font-size: 0.8rem;
+  }
+
+  /* Voter info */
+  .voter-info-label {
+    font-size: 0.8rem;
+  }
+
+  .voter-info-value {
+    font-size: 0.85rem;
+  }
+
+  /* ✅ FIX: Students table — match base 4-col layout, tighter sizing */
+  .students-table-header,
+  .students-table-row {
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+    font-size: 0.65rem;
+    padding: 8px 6px;
+  }
+
+  /* ✅ FIX: Action buttons tighter on mobile */
+  .action-btn {
+    padding: 3px 5px;
+    font-size: 0.65rem;
+  }
+
+  .action-btns {
+    gap: 3px;
+  }
+
+  /* ✅ FIX: Delete confirm stacks vertically on mobile */
+  .delete-confirm {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.8rem;
+  }
+
+  /* ✅ FIX: Winner stats drops to 2 cols on mobile */
+  .winner-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .winner-name {
+    font-size: 1.5rem;
+  }
+
+  .winner-stat h3 {
+    font-size: 1.2rem;
+  }
+
+  /* Camera / face */
+  .video-container {
+    max-width: 100%;
+  }
+
+  .face-overlay {
+    width: 160px;
+    height: 210px;
+  }
+
+  /* Admin */
+  .admin-section {
+    padding: 15px;
+  }
+
+  /* Pagination */
+  .pagination {
+    gap: 8px;
+  }
+
+  .pagination-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .pagination-info {
+    font-size: 0.8rem;
+  }
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import { getAdminStats, getElections, startSession, endSession, publishResults } from '../../services/adminService';
+import { getAdminStats, getElections, startSession, endSession, publishResults, createElection, addCandidate, getCandidates, resetAllData  } from '../../services/adminService';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -13,6 +13,11 @@ const Dashboard = () => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [phase, setPhase] = useState(sessionStorage.getItem('adminPhase') || 'idle');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newElection, setNewElection] = useState({ title: '', description: '', startDate: '', endDate: '' });
+  const [showCandidateForm, setShowCandidateForm] = useState(false);
+  const [candidates, setCandidates] = useState([]);
+  const [newCandidate, setNewCandidate] = useState({ name: '', position: '', party: '' });
 
   const admin = JSON.parse(sessionStorage.getItem('admin'));
 
@@ -40,6 +45,26 @@ const Dashboard = () => {
     const result = await getElections();
     if (result.success) {
       setElections(result.elections);
+
+      const savedElectionId = sessionStorage.getItem('electionId');
+      
+      // find active election even if no savedElectionId
+      const activeElection = result.elections.find(e => e.status === 'active');
+      const electionToUse = savedElectionId 
+        ? result.elections.find(e => e.id === savedElectionId)
+        : activeElection;
+
+      if (electionToUse) {
+        setSelectedElection(electionToUse.id);
+        sessionStorage.setItem('electionId', electionToUse.id);
+        if (electionToUse.status === 'active') {
+          setPhase('voting');
+          sessionStorage.setItem('adminPhase', 'voting');
+        } else if (electionToUse.status === 'completed') {
+          setPhase('counting');
+          sessionStorage.setItem('adminPhase', 'counting');
+        }
+      }
     }
   } catch (err) {
     console.error('Elections error:', err);
@@ -47,16 +72,16 @@ const Dashboard = () => {
 };
 
   const loadStats = async () => {
-  try {
-    const result = await getAdminStats(phase);
-    if (result.success) {
-      setStats(result.stats);
+    try {
+      const result = await getAdminStats(phase);
+      if (result.success) {
+        setStats(result.stats);
+      }
+    } catch (err) {
+      console.error('Stats error:', err);
     }
-  } catch (err) {
-    console.error('Stats error:', err);
-  }
-  setLoading(false);
-};
+    setLoading(false);
+  };
 
   const showMessage = (msg, type) => {
     setMessage(msg);
@@ -103,6 +128,53 @@ const Dashboard = () => {
       showMessage('Failed to publish results', 'error');
     }
   };
+
+  const handleCreateElection = async () => {
+    const result = await createElection(newElection);
+    if (result.success) {
+      showMessage('Election created successfully!', 'success');
+      setShowCreateForm(false);
+      setNewElection({ title: '', description: '', startDate: '', endDate: '' });
+      loadElections();
+    } else {
+      showMessage(result.message || 'Failed to create election', 'error');
+    }
+  };
+
+  const handleLoadCandidates = async (electionId) => {
+    if (!electionId) return;
+    const result = await getCandidates(electionId);
+    if (result.success) {
+      setCandidates(result.candidates);
+    }
+  };
+
+  const handleAddCandidate = async () => {
+    const result = await addCandidate(selectedElection, newCandidate);
+    if (result.success) {
+      showMessage('Candidate added successfully!', 'success');
+      setNewCandidate({ name: '', position: '', party: '' });
+      handleLoadCandidates(selectedElection);
+    } else {
+      showMessage(result.message || 'Failed to add candidate', 'error');
+    }
+  };
+
+  const handleResetData = async () => {
+  const confirm = window.confirm('Are you sure you want to reset ALL election data? This cannot be undone!');
+  if (!confirm) return;
+  const result = await resetAllData();
+  if (result.success) {
+    setPhase('idle');
+    sessionStorage.removeItem('adminPhase');
+    sessionStorage.removeItem('electionId');
+    showMessage('All data reset successfully!', 'success');
+    loadElections();
+    loadStats();
+  } else {
+    showMessage(result.message || 'Failed to reset data', 'error');
+  }
+};
 
   return (
     <div className="voting-system">
@@ -161,6 +233,55 @@ const Dashboard = () => {
                 </div>
 
                 <div className="admin-section">
+                  <h3 className="admin-section-title">Elections</h3>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => setShowCreateForm(!showCreateForm)}
+                    disabled={phase !== 'idle'}
+                  >
+                    {showCreateForm ? 'CANCEL' : '+ CREATE ELECTION'}
+                  </button>
+
+                  {showCreateForm && (
+                    <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <input
+                        className="form-input"
+                        placeholder="Election Title"
+                        value={newElection.title}
+                        onChange={(e) => setNewElection({ ...newElection, title: e.target.value })}
+                      />
+                      <input
+                        className="form-input"
+                        placeholder="Description"
+                        value={newElection.description}
+                        onChange={(e) => setNewElection({ ...newElection, description: e.target.value })}
+                      />
+                      <input
+                        className="form-input"
+                        type="datetime-local"
+                        placeholder="Start Date"
+                        value={newElection.startDate}
+                        onChange={(e) => setNewElection({ ...newElection, startDate: e.target.value })}
+                      />
+                      <input
+                        className="form-input"
+                        type="datetime-local"
+                        placeholder="End Date"
+                        value={newElection.endDate}
+                        onChange={(e) => setNewElection({ ...newElection, endDate: e.target.value })}
+                      />
+                      <button
+                        className="btn btn-primary"
+                        onClick={handleCreateElection}
+                        disabled={!newElection.title || !newElection.startDate || !newElection.endDate}
+                      >
+                        SAVE ELECTION
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="admin-section">
                   <h3 className="admin-section-title">Select Election</h3>
                   <select
                     className="form-input"
@@ -168,6 +289,7 @@ const Dashboard = () => {
                     onChange={(e) => {
                       setSelectedElection(e.target.value);
                       sessionStorage.setItem('electionId', e.target.value);
+                      handleLoadCandidates(e.target.value);
                     }}
                     disabled={phase !== 'idle'}
                   >
@@ -178,6 +300,58 @@ const Dashboard = () => {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div className="admin-section">
+                  <h3 className="admin-section-title">Manage Candidates</h3>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => setShowCandidateForm(!showCandidateForm)}
+                    disabled={phase !== 'idle' || !selectedElection}
+                  >
+                    {showCandidateForm ? 'CANCEL' : '+ MANAGE CANDIDATES'}
+                  </button>
+
+                  {showCandidateForm && selectedElection && (
+                    <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <input
+                        className="form-input"
+                        placeholder="Candidate Name"
+                        value={newCandidate.name}
+                        onChange={(e) => setNewCandidate({ ...newCandidate, name: e.target.value })}
+                      />
+                      <input
+                        className="form-input"
+                        placeholder="Position (e.g. President)"
+                        value={newCandidate.position}
+                        onChange={(e) => setNewCandidate({ ...newCandidate, position: e.target.value })}
+                      />
+                      <input
+                        className="form-input"
+                        placeholder="Party (optional)"
+                        value={newCandidate.party}
+                        onChange={(e) => setNewCandidate({ ...newCandidate, party: e.target.value })}
+                      />
+                      <button
+                        className="btn btn-primary"
+                        onClick={handleAddCandidate}
+                        disabled={!newCandidate.name || !newCandidate.position}
+                      >
+                        ADD CANDIDATE
+                      </button>
+
+                      {candidates.length > 0 && (
+                        <div style={{ marginTop: '10px' }}>
+                          <p><strong>Candidates added:</strong></p>
+                          {candidates.map((c, i) => (
+                            <div key={i} style={{ padding: '5px 0', borderBottom: '1px solid #eee' }}>
+                              {c.name} — {c.position} {c.party ? `(${c.party})` : ''}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="admin-section">
@@ -237,6 +411,16 @@ const Dashboard = () => {
                     </button>
                   </div>
                 </div>
+
+                <div className="admin-section">
+  <button
+    className="btn btn-danger"
+    onClick={handleResetData}
+    disabled={phase === 'voting'}
+  >
+     RESET ALL DATA
+  </button>
+</div>
 
                 <div className="admin-section">
                   <button

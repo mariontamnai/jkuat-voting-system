@@ -22,8 +22,6 @@ const WinnerAnnouncement = () => {
     setLoading(false);
   };
 
-  const winner = results?.candidates[0];
-
   return (
     <div className="voting-system">
       <div className="bg-animation" />
@@ -35,48 +33,100 @@ const WinnerAnnouncement = () => {
             <div className="loading-text">Loading results...</div>
           ) : (
             <div className="card">
-              <div className="official-badge"> OFFICIAL RESULTS</div>
+              <div className="official-badge">OFFICIAL RESULTS</div>
 
-              <div className="winner-container">
-                <div className="trophy">🏆</div>
-                <p className="winner-label">WINNER</p>
-                <h2 className="winner-name">{winner?.name}</h2>
-                <p className="winner-faculty">{winner?.faculty}</p>
-
-                <div className="winner-stats">
-                  <div className="winner-stat">
-                    <h3>{winner?.votes}</h3>
-                    <p>VOTES</p>
+              {/* Winner per position */}
+              {results?.candidatesByPosition 
+                ? Object.entries(results.candidatesByPosition).map(([position, candidates]) => {
+                    const winner = candidates[0];
+                    const positionTotalVotes = candidates.reduce((sum, c) => sum + c.votes, 0);
+                    const winnerPercentage = positionTotalVotes > 0 
+                      ? parseFloat(((winner.votes / positionTotalVotes) * 100).toFixed(1)) 
+                      : 0;
+                    return (
+                      <div key={position} className="winner-container" style={{ marginBottom: '30px', borderBottom: '1px solid #eee', paddingBottom: '20px' }}>
+                        <div className="trophy">🏆</div>
+                        <p className="winner-label">WINNER — {position}</p>
+                        <h2 className="winner-name">{winner?.name}</h2>
+                        <p className="winner-faculty">{position}</p>
+                        <div className="winner-stats">
+                          <div className="winner-stat">
+                            <h3>{winner?.votes}</h3>
+                            <p>VOTES</p>
+                          </div>
+                          <div className="winner-stat">
+                            <h3>{winnerPercentage}%</h3>
+                            <p>OF VOTES</p>
+                          </div>
+                          <div className="winner-stat">
+                            <h3>{results?.turnout}%</h3>
+                            <p>TURNOUT</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                : (
+                  <div className="winner-container">
+                    <div className="trophy">🏆</div>
+                    <p className="winner-label">WINNER</p>
+                    <h2 className="winner-name">{results?.candidates[0]?.name}</h2>
+                    <div className="winner-stats">
+                      <div className="winner-stat">
+                        <h3>{results?.candidates[0]?.votes}</h3>
+                        <p>VOTES</p>
+                      </div>
+                      <div className="winner-stat">
+                        <h3>{results?.candidates[0]?.percentage}%</h3>
+                        <p>OF VOTES</p>
+                      </div>
+                      <div className="winner-stat">
+                        <h3>{results?.turnout}%</h3>
+                        <p>TURNOUT</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="winner-stat">
-                    <h3>{winner?.percentage}%</h3>
-                    <p>OF VOTES</p>
-                  </div>
-                  <div className="winner-stat">
-                    <h3>{results?.turnout}%</h3>
-                    <p>TURNOUT</p>
-                  </div>
-                </div>
-              </div>
+                )
+              }
 
               <div className="section-divider" />
               <h3 className="section-title">Final Results</h3>
               <div className="section-divider" />
 
-              <div className="results-list">
-                {results?.candidates.map((candidate, index) => (
-                  <ResultBar
-                    key={candidate.id}
-                    candidate={candidate}
-                    rank={index + 1}
-                    isLeader={index === 0}
-                  />
-                ))}
-              </div>
+              {/* Results grouped by position */}
+              {results?.candidatesByPosition
+                ? Object.entries(results.candidatesByPosition).map(([position, candidates]) => (
+                  <div key={position} style={{ marginBottom: '20px' }}>
+                    <h4 style={{ color: '#2d6a4f', marginBottom: '10px' }}>{position}</h4>
+                    <div className="results-list">
+                      {candidates.map((candidate, index) => (
+                        <ResultBar
+                          key={candidate.id}
+                          candidate={candidate}
+                          rank={index + 1}
+                          isLeader={index === 0}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))
+                : (
+                  <div className="results-list">
+                    {results?.candidates.map((candidate, index) => (
+                      <ResultBar
+                        key={candidate.id}
+                        candidate={candidate}
+                        rank={index + 1}
+                        isLeader={index === 0}
+                      />
+                    ))}
+                  </div>
+                )
+              }
 
               <div className="final-stats">
                 <div className="final-stats-row">
-                  <span>Total Votes Cast</span>
+                  <span>Voters Participated</span>
                   <span><strong>{results?.totalVotes}</strong></span>
                 </div>
                 <div className="final-stats-row">
@@ -103,9 +153,18 @@ const WinnerAnnouncement = () => {
                   </button>
                 )}
                 <button
+                  className="btn btn-outline"
+                  onClick={() => navigate('/')}
+                >
+                  BACK TO HOME
+                </button>
+                <button
                   className="btn btn-danger"
                   onClick={() => {
-                    sessionStorage.clear();
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('votingToken');
+                    sessionStorage.removeItem('user');
+                    sessionStorage.removeItem('votedFor');
                     navigate('/');
                   }}
                 >
