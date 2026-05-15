@@ -11,7 +11,12 @@ import Results from './pages/Results';
 import Dashboard from './pages/admin/Dashboard';
 import Students from './pages/admin/Students';
 import WinnerAnnouncement from './pages/WinnerAnnouncement';
-import ChangePassword from './pages/ChangePassword';   // 👈 ADD THIS
+import ChangePassword from './pages/ChangePassword';
+import Elections from './pages/admin/Elections';
+import Candidates from './pages/admin/Candidates';
+import CandidatesList from './pages/admin/CandidatesList';
+
+
 
 function App() {
   return (
@@ -20,7 +25,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/student-login" element={<StudentLogin />} />
         <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/change-password" element={<ChangePassword />} />  {/* 👈 ADD THIS */}
+        <Route path="/admin/elections" element={<Elections />} />
+        <Route path="/admin/candidates" element={<Candidates />} />
+        <Route path="/admin/candidates/list" element={<CandidatesList />} />
+        <Route path="/change-password" element={<ChangePassword />} />  
         <Route path="/face-recognition" element={<FaceRecognition />} />
         <Route path="/vote" element={<CastVote />} />
         <Route path="/vote-submitted" element={<VoteSubmitted />} />
