@@ -1928,3 +1928,15 @@ select.form-input {
     font-size: 0.7rem;
   }
 }
+.view-students-container {
+    margin-top: 16px;
+    text-align: center;
+ }
+        
+.view-students-btn {
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     width: auto;
+     padding: 12px 24px;
+  }
