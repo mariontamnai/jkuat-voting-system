@@ -24,6 +24,7 @@ const StudentList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingStudent, setEditingStudent] = useState(null);
   const [editEmailError, setEditEmailError] = useState(false);
+
   const [editForm, setEditForm] = useState({
     name: '',
     email: '',
@@ -104,17 +105,16 @@ const StudentList = () => {
   };
 
   const handleDeleteStudent = async (studentId) => {
-    const result = await deleteStudent(studentId);
-
-    if (result.success) {
-      showMessage('Student deleted successfully!', 'success');
-
-      setStudents(prev =>
-        prev.filter(s => s.id !== studentId)
-      );
-      setShowDeleteConfirm(null);
-    }
-  };
+  const result = await deleteStudent(studentId);
+  
+  if (result.success) {
+    showMessage('Student deleted successfully!', 'success');
+    await loadStudents(); 
+    setShowDeleteConfirm(null);
+  } else {
+    showMessage(result.message || 'Failed to delete student', 'error');
+  }
+};
 
   const handleResetPassword = async (student) => {
     const tempPassword = Math.random()
@@ -330,13 +330,14 @@ const StudentList = () => {
                                   Reset
                                 </button>
 
-                                <button
-                                  className="action-btn delete-btn"
-                                  title="Delete Student"
-                                  onClick={() => setShowDeleteConfirm(student.id)}
-                                >
-                                  Delete
-                                </button>
+                               {showDeleteConfirm === student.id ? (
+  <div className="action-btns">
+    <button className="action-btn delete-confirm-btn" onClick={() => handleDeleteStudent(student.id)}>Confirm</button>
+    <button className="action-btn cancel-btn" onClick={() => setShowDeleteConfirm(null)}>Cancel</button>
+  </div>
+) : (
+  <button className="action-btn delete-btn" onClick={() => setShowDeleteConfirm(student.id)}>Delete</button>
+)} 
                               </div>
                             </>
                           )}

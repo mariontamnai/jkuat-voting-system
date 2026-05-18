@@ -18,6 +18,7 @@ const AddStudent = () => {
   const [faceDescriptor, setFaceDescriptor] = useState(null);
   const [faceCaptured, setFaceCaptured] = useState(false);
   const [capturing, setCapturing] = useState(false);
+  const [adding, setAdding] = useState(false); // NEW: loading state for add button
   const [students, setStudents] = useState([]);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -187,6 +188,7 @@ const AddStudent = () => {
   };
 
   const handleAddStudent = async () => {
+    // Validation checks
     if (
       !studentForm.name ||
       !studentForm.year ||
@@ -210,49 +212,70 @@ const AddStudent = () => {
       return;
     }
 
+    // Face duplicate check
     const threshold = 0.45;
-
     for (const existing of students) {
       if (!existing.faceDescriptor) continue;
-
-      const distance = faceapi.euclideanDistance(
-        faceDescriptor,
-        existing.faceDescriptor
-      );
-
+      const distance = faceapi.euclideanDistance(faceDescriptor, existing.faceDescriptor);
       if (distance < threshold) {
-        showMessage(
-          `This face already belongs to ${existing.name}`,
-          'error'
-        );
-
+        showMessage(`This face already belongs to ${existing.name}`, 'error');
         return;
       }
     }
 
-    const result = await addStudent({
-      ...studentForm,
-      faceDescriptor
-    });
+    setAdding(true);
 
-    if (result.success) {
-      setStudentForm({
-        name: '',
-        year: '',
-        email: '',
-        regNo: '',
-        course: '',
-        password: '',
+    try {
+      const result = await addStudent({
+        ...studentForm,
+        faceDescriptor
       });
 
-      setFaceDescriptor(null);
-      setFaceCaptured(false);
-      setEmailError(false);
+      console.log('Add student response:', result);
 
-      showMessage('Student added successfully', 'success');
+      if (result && result.success) {
+        // Clear form
+        setStudentForm({
+          name: '',
+          year: '',
+          email: '',
+          regNo: '',
+          course: '',
+          password: '',
+        });
 
-    } else {
-      showMessage(result.message || 'Failed to add student', 'error');
+        setFaceDescriptor(null);
+        setFaceCaptured(false);
+        setEmailError(false);
+
+        // Show success message
+        setMessage('Student added successfully!');
+        setMessageType('success');
+        
+        // Reload students list
+        await loadStudents();
+
+        // Clear message after 4 seconds
+        setTimeout(() => {
+          setMessage('');
+        }, 4000);
+        
+      } else {
+        setMessage(result?.message || 'Failed to add student');
+        setMessageType('error');
+        setTimeout(() => {
+          setMessage('');
+        }, 4000);
+      }
+    } catch (error) {
+      console.error('Add student error:', error);
+      setMessage('An error occurred while adding student');
+      setMessageType('error');
+      setTimeout(() => {
+        setMessage('');
+      }, 4000);
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -266,7 +289,7 @@ const AddStudent = () => {
         <div className="screen-container">
           <div className="card admin-container">
 
-            {/* Header with Back button and title only - View button removed from here */}
+            {/* Header with Back button and title only */}
             <div className="page-top">
               <button
                 className="back-btn"
@@ -492,16 +515,29 @@ const AddStudent = () => {
               <button
                 className="btn btn-primary submit-btn"
                 onClick={handleAddStudent}
+                disabled={adding}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 3 7 8 15 8" />
-                </svg>
-                ADD STUDENT
+                {adding ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', animation: 'spin 1s linear infinite' }}>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                    ADDING...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px' }}>
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                      <polyline points="17 21 17 13 7 13 7 21" />
+                      <polyline points="7 3 7 8 15 8" />
+                    </svg>
+                    ADD STUDENT
+                  </>
+                )}
               </button>
 
-              {/* View Registered Students Button - Moved to bottom after ADD STUDENT */}
+              {/* View Registered Students Button - at the bottom */}
               <div className="view-students-container">
                 <Link to="/admin/students/list" className="btn btn-outline view-students-btn">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
@@ -518,8 +554,6 @@ const AddStudent = () => {
       </div>
 
       <Footer />
-
-      
     </div>
   );
 };

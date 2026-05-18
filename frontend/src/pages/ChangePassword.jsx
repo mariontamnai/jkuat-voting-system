@@ -50,17 +50,26 @@ const ChangePassword = () => {
       <div className="container">
         <Header />
         <div className="screen-container">
-          <div className="card">
-            <h2>Set Your Password</h2>
-            <p className="helper-text">
-              Welcome {user?.name}! Please set your own password before continuing.
+          <div className="card password-change-card" style={{ maxWidth: '500px', margin: '0 auto' }}>
+            
+            {/* Icon */}
+            <div className="password-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+
+            <h2 className="password-title">Set Your Password</h2>
+            <p className="password-welcome">
+              Welcome <strong>{user?.name || 'Student'}</strong>! Please set your own password before continuing.
             </p>
 
-            {error && <div className="alert alert-error">{error}</div>}
+            {error && <div className="alert alert-error password-alert">{error}</div>}
 
             <div className="form-group">
               <label className="form-label">NEW PASSWORD</label>
-              <div className="input-wrapper">
+              <div className="input-wrapper password-wrapper-custom">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="form-input"
@@ -70,7 +79,7 @@ const ChangePassword = () => {
                 />
                 <button
                   type="button"
-                  className="eye-btn"
+                  className="eye-btn-custom"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -86,11 +95,12 @@ const ChangePassword = () => {
                   )}
                 </button>
               </div>
+              <p className="input-hint">Minimum 6 characters required</p>
             </div>
 
             <div className="form-group">
               <label className="form-label">CONFIRM PASSWORD</label>
-              <div className="input-wrapper">
+              <div className="input-wrapper password-wrapper-custom">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="form-input"
@@ -100,7 +110,7 @@ const ChangePassword = () => {
                 />
                 <button
                   type="button"
-                  className="eye-btn"
+                  className="eye-btn-custom"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -120,17 +130,25 @@ const ChangePassword = () => {
 
             <div className="button-group">
               <button
-                className="btn btn-primary"
+                className="btn btn-primary password-submit-btn"
                 onClick={handleChangePassword}
                 disabled={loading}
               >
                 {loading ? 'SAVING...' : 'SET PASSWORD & CONTINUE'}
               </button>
             </div>
+
+            <div className="password-footer">
+              <button className="back-link" onClick={() => navigate('/student-login')}>
+                ← Back to Login
+              </button>
+            </div>
           </div>
         </div>
       </div>
       <Footer />
+
+      
     </div>
   );
 };
