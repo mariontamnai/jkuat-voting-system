@@ -134,6 +134,16 @@ const Dashboard = () => {
             <h2>Admin Dashboard</h2>
             <p className="helper-text">Welcome, {admin?.name}</p>
 
+            <button
+  className="btn btn-outline"
+  onClick={() => {
+    sessionStorage.clear();
+    navigate('/');
+  }}
+>
+  LOGOUT
+</button>
+
             {message && (
               <div className={`alert alert-${messageType}`}>{message}</div>
             )}
@@ -189,15 +199,7 @@ const Dashboard = () => {
                   )}
                 </div>
 
-                <button
-  className="btn btn-outline"
-  onClick={() => {
-    sessionStorage.clear();
-    navigate('/');
-  }}
->
-  LOGOUT
-</button>
+                
                 
               </>
             )}
