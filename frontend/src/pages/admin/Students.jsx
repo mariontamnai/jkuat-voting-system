@@ -356,7 +356,7 @@ const Students = () => {
   onChange={(e) => {
     const val = e.target.value;
     setStudentForm({ ...studentForm, email: val });
-    setEmailError(val.length > 0 && !emailRegex);
+    setEmailError(val.length > 0 && !emailRegex.test(val));
   }}
 />
               </div>
@@ -561,7 +561,7 @@ const Students = () => {
   onChange={(e) => {
     const val = e.target.value;
     setEditForm({ ...editForm, email: val });
-    setEditEmailError(false);
+    setEditEmailError(val.length > 0 && !emailRegex.test(val));
   }}
   style={{ padding: '6px', fontSize: '0.85rem' }}
 />
