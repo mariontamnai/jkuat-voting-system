@@ -15,6 +15,8 @@ import ChangePassword from './pages/ChangePassword';
 import Elections from './pages/admin/Elections';
 import Candidates from './pages/admin/Candidates';
 import CandidatesList from './pages/admin/CandidatesList';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 
 
@@ -28,7 +30,9 @@ function App() {
         <Route path="/admin/elections" element={<Elections />} />
         <Route path="/admin/candidates" element={<Candidates />} />
         <Route path="/admin/candidates/list" element={<CandidatesList />} />
-        <Route path="/change-password" element={<ChangePassword />} />  
+        <Route path="/change-password" element={<ChangePassword />} /> 
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/face-recognition" element={<FaceRecognition />} />
         <Route path="/vote" element={<CastVote />} />
         <Route path="/vote-submitted" element={<VoteSubmitted />} />
