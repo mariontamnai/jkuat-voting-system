@@ -50,7 +50,6 @@ function App() {
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/session-control" element={<SessionControl />} />
         <Route path="/admin/settings" element={<Settings />} />
-        <Route path="/admin/students" element={<Students />} />
         <Route path="/admin/audit-logs" element={<AuditLogs />} />
         <Route path="/winner" element={<WinnerAnnouncement />} />
       </Routes>
