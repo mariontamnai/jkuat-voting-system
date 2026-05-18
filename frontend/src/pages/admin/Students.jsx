@@ -69,7 +69,6 @@ const Students = () => {
   const showMessage = (msg, type) => {
     setMessage(msg);
     setMessageType(type);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => setMessage(''), 5000);
   };
 
@@ -479,9 +478,12 @@ console.log("SENDING TO BACKEND:", {
                 )}
               </div>
 
-              <button className="btn btn-primary" onClick={handleAddStudent}>
-                ADD STUDENT
-              </button>
+              {message && (
+  <div className={`alert alert-${messageType}`}>{message}</div>
+)}
+<button className="btn btn-primary" onClick={handleAddStudent}>
+  ADD STUDENT
+</button>
             </div>
 
             <div className="admin-section">
