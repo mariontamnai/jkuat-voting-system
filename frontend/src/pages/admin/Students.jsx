@@ -5,6 +5,8 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { getStudents, addStudent, updateStudent, deleteStudent } from '../../services/adminService';
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const Students = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -180,46 +182,60 @@ const Students = () => {
       showMessage('Please fill in all fields', 'error');
       return;
     }
+
+    // ✅ EMAIL VALIDATION
+    if (!emailRegex.test(studentForm.email)) {
+      showMessage('Please enter a valid email address (e.g. name@example.com)', 'error');
+      return;
+    }
+
     if (!faceDescriptor) {
       showMessage('Please capture student face first', 'error');
       return;
     }
 
     const threshold = 0.45;
-  for (const existing of students) {
-    if (!existing.faceDescriptor) continue;
-    const distance = faceapi.euclideanDistance(
-      faceDescriptor,
-      existing.faceDescriptor
-    );
-    if (distance < threshold) {
-      showMessage(
-        `This face is already registered to ${existing.name} (${existing.regNo}). Each student must use their own face.`,
-        'error'
+    for (const existing of students) {
+      if (!existing.faceDescriptor) continue;
+      const distance = faceapi.euclideanDistance(
+        faceDescriptor,
+        existing.faceDescriptor
       );
-      return;
+      if (distance < threshold) {
+        showMessage(
+          `This face is already registered to ${existing.name} (${existing.regNo}). Each student must use their own face.`,
+          'error'
+        );
+        return;
+      }
     }
-  }
 
-  console.log("REGISTERING WITH PASSWORD:", studentForm.password);
+    console.log("REGISTERING WITH PASSWORD:", studentForm.password);
 
-  const result = await addStudent({ ...studentForm, faceDescriptor });
-  if (result.success) {
-    showMessage('Student added successfully!', 'success');
-    setStudents(prev => [...prev, result.student]);
-    setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
-    setFaceDescriptor(null);
-    setFaceCaptured(false);
-  } else {
-    showMessage(result.message ||'Failed to add student', 'error');
-  }
-};
+    const result = await addStudent({ ...studentForm, faceDescriptor });
+    if (result.success) {
+      showMessage('Student added successfully!', 'success');
+      setStudents(prev => [...prev, result.student]);
+      setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
+      setFaceDescriptor(null);
+      setFaceCaptured(false);
+    } else {
+      showMessage(result.message || 'Failed to add student', 'error');
+    }
+  };
 
   const handleEditStudent = async (studentId) => {
     if (!editForm.name) {
       showMessage('Please enter a name', 'error');
       return;
     }
+
+    // ✅ EMAIL VALIDATION ON EDIT
+    if (editForm.email && !emailRegex.test(editForm.email)) {
+      showMessage('Please enter a valid email address (e.g. name@example.com)', 'error');
+      return;
+    }
+
     const updateData = {
       name: editForm.name,
       email: editForm.email,
@@ -254,18 +270,18 @@ const Students = () => {
   };
 
   const handleResetPassword = async (student) => {
-  const tempPassword = Math.random().toString(36).slice(-8).toUpperCase();
-  const result = await updateStudent(student.id, {
-    password: tempPassword,
-    isFirstLogin: true,
-  });
-  if (result.success) {
-    showMessage(`Password reset. Temp password: ${tempPassword} — share with ${student.name} securely`, 'success');
-    setShowResetConfirm(null);
-  } else {
-    showMessage('Failed to reset password', 'error');
-  }
-};
+    const tempPassword = Math.random().toString(36).slice(-8).toUpperCase();
+    const result = await updateStudent(student.id, {
+      password: tempPassword,
+      isFirstLogin: true,
+    });
+    if (result.success) {
+      showMessage(`Password reset. Temp password: ${tempPassword} — share with ${student.name} securely`, 'success');
+      setShowResetConfirm(null);
+    } else {
+      showMessage('Failed to reset password', 'error');
+    }
+  };
 
   const filteredStudents = students
     .filter(s => {
@@ -602,7 +618,7 @@ const Students = () => {
 
                                   <button
                                     className="action-btn reset-btn"
-                                    title="Reset Password to Reg Number"
+                                    title="Reset Password"
                                     onClick={() => setShowResetConfirm(student.id)}
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -630,7 +646,6 @@ const Students = () => {
                               </div>
                             )}
 
-                            {/* ✅ DELETE CONFIRM — inside map */}
                             {showDeleteConfirm === student.id && (
                               <div className="delete-confirm">
                                 <p>Delete <strong>{student.name}</strong>?</p>
@@ -651,10 +666,9 @@ const Students = () => {
                               </div>
                             )}
 
-                            {/* ✅ RESET CONFIRM — inside map, student is in scope here */}
                             {showResetConfirm === student.id && (
                               <div className="delete-confirm">
-                                <p>Reset <strong>{student.name}</strong>'s password to their reg number?</p>
+                                <p>Reset <strong>{student.name}</strong>'s password?</p>
                                 <p style={{ fontSize: '0.8rem', color: '#888' }}>
                                   They will be forced to set a new password on next login.
                                 </p>
@@ -675,7 +689,7 @@ const Students = () => {
                               </div>
                             )}
 
-                          </div> 
+                          </div>
                         ))}
                       </div>
 

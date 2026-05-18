@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [regNumber, setRegNumber] = useState('');
@@ -14,6 +16,11 @@ const ForgotPassword = () => {
   const handleSubmit = async () => {
     if (!regNumber || !email) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address (e.g. name@example.com)');
       return;
     }
 
