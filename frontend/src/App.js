@@ -17,6 +17,7 @@ import Candidates from './pages/admin/Candidates';
 import CandidatesList from './pages/admin/CandidatesList';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import AuditLogs from './pages/admin/AuditLogs';
 
 
 
@@ -39,6 +40,7 @@ function App() {
         <Route path="/results" element={<Results />} />
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/students" element={<Students />} />
+        <Route path="/admin/audit-logs" element={<AuditLogs />} />
         <Route path="/winner" element={<WinnerAnnouncement />} />
       </Routes>
     </Router>

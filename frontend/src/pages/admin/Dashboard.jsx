@@ -106,12 +106,14 @@ const Dashboard = () => {
   };
 
   const navCards = [
-    { label: 'Manage Elections', icon: '🗳️', path: '/admin/elections', enabled: true },
-    { label: 'Manage Candidates', icon: '👤', path: '/admin/candidates', enabled: true },
-    { label: 'Manage Students', icon: '👨‍🎓', path: '/admin/students', enabled: true },
-    { label: 'View Results', icon: '📊', path: '/results', enabled: phase === 'counting' || phase === 'published' },
-    { label: 'View Winner', icon: '🏆', path: '/winner', enabled: phase === 'published' },
+    { label: 'Manage Elections', path: '/admin/elections', enabled: true },
+    { label: 'Manage Candidates', path: '/admin/candidates', enabled: true },
+    { label: 'Manage Students', path: '/admin/students', enabled: true },
+    { label: 'View Results', path: '/results', enabled: phase === 'counting' || phase === 'published' },
+    { label: 'View Winner', path: '/winner', enabled: phase === 'published' },
+    { label: 'Audit Logs', path: '/admin/audit-logs', enabled: true },
   ];
+  
 
   return (
     <div className="voting-system">
@@ -166,7 +168,7 @@ const Dashboard = () => {
                         disabled={!card.enabled}
                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', padding: '20px 10px' }}
                       >
-                        <span style={{ fontSize: '1.8rem' }}>{card.icon}</span>
+                        
                         <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{card.label}</span>
                       </button>
                     ))}
