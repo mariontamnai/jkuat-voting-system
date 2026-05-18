@@ -96,48 +96,63 @@ export const addStudent = async (studentData) => {
   }
 
   const token = sessionStorage.getItem('token');
-  const response = await fetch(`${config.API_URL}/api/admin/students`, {
-    method: 'POST',
-    headers: {
-      ...authHeaders(token),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      regNumber: studentData.regNo,
-      fullName: studentData.name,
-      email: studentData.email,
-      year: studentData.year,
-      course: studentData.course,
-      password: studentData.password,
-      faceDescriptor: studentData.faceDescriptor
-    })
-  })
   
-  const data = await response.json()
-  
-  if (response.ok) {
-    return {
-      success: true,
-      message: data.message || 'Student added successfully',
-      student: {
-        id: data.student?._id || Date.now(),
-        name: studentData.name,
-        regNo: studentData.regNo,
-        year: studentData.year,
+  // Create AbortController for timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+  try {
+    const response = await fetch(`${config.API_URL}/api/admin/students`, {
+      method: 'POST',
+      headers: {
+        ...authHeaders(token),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        regNumber: studentData.regNo,
+        fullName: studentData.name,
         email: studentData.email,
+        year: studentData.year,
         course: studentData.course,
-        hasVoted: false,
+        password: studentData.password,
         faceDescriptor: studentData.faceDescriptor
+      }),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      return {
+        success: true,
+        message: data.message || 'Student added successfully',
+        student: {
+          id: data.student?._id || Date.now(),
+          name: studentData.name,
+          regNo: studentData.regNo,
+          year: studentData.year,
+          email: studentData.email,
+          course: studentData.course,
+          hasVoted: false,
+          faceDescriptor: studentData.faceDescriptor
+        }
       }
     }
+    
+    return { 
+      success: false, 
+      message: data.message || 'Failed to add student' 
+    }
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      return { success: false, message: 'Request timeout. Server is taking too long to respond.' };
+    }
+    return { success: false, message: error.message || 'Failed to add student' };
   }
-  
-  // Make sure to return a proper error response
-  return { 
-    success: false, 
-    message: data.message || 'Failed to add student' 
-  }
-}
+};
 
 export const updateStudent = async (studentId, studentData) => {
   if (config.USE_MOCK) {
