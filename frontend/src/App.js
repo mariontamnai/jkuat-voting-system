@@ -31,6 +31,7 @@ function App() {
         <Route path="/student-login" element={<StudentLogin />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin/elections" element={<Elections />} />
+        <Route path="/admin/elections/create" element={<CreateElection />} />
         <Route path="/admin/candidates" element={<Candidates />} />
         <Route path="/admin/candidates/list" element={<CandidatesList />} />
         <Route path="/change-password" element={<ChangePassword />} /> 
