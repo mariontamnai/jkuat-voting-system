@@ -114,20 +114,21 @@ export const addStudent = async (studentData) => {
   })
   const data = await response.json()
   if (response.ok) {
-    return {
-      success: true,
-      message: data.message,
-      student: {
-        id: data._id,
-        name: data.fullName,
-        regNo: data.regNumber,
-        year: data.year,
-        email: data.email,
-        hasVoted: false,
-        faceDescriptor: studentData.faceDescriptor
-      }
+  return {
+    success: true,
+    message: data.message,
+    student: {
+      id: Date.now(),
+      name: studentData.name,
+      regNo: studentData.regNo,
+      year: studentData.year,
+      email: studentData.email,
+      course: studentData.course,
+      hasVoted: false,
+      faceDescriptor: studentData.faceDescriptor
     }
   }
+}
   return { success: false, message: data.message }
 }
 

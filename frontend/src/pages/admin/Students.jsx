@@ -212,8 +212,15 @@ const Students = () => {
       }
     }
 
-    console.log("REGISTERING WITH PASSWORD:", studentForm.password);
-
+console.log("SENDING TO BACKEND:", {
+  regNumber: studentForm.regNo,
+  fullName: studentForm.name,
+  email: studentForm.email,
+  course: studentForm.course,
+  year: studentForm.year,
+  password: studentForm.password,
+  faceDescriptor: faceDescriptor ? 'present' : 'MISSING'
+});
     const result = await addStudent({ ...studentForm, faceDescriptor });
     if (result.success) {
       showMessage('Student added successfully!', 'success');
