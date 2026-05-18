@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as faceapi from 'face-api.js';
+const faceapi = window.faceapi;
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { getStudents, addStudent, updateStudent, deleteStudent } from '../../services/adminService';
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Students = () => {
   const navigate = useNavigate();
@@ -25,6 +27,8 @@ const Students = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [emailError, setEmailError] = useState(false);
+  const [editEmailError, setEditEmailError] = useState(false);
   const [studentForm, setStudentForm] = useState({
     name: '',
     year: '',
@@ -65,7 +69,6 @@ const Students = () => {
   const showMessage = (msg, type) => {
     setMessage(msg);
     setMessageType(type);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => setMessage(''), 5000);
   };
 
@@ -180,46 +183,76 @@ const Students = () => {
       showMessage('Please fill in all fields', 'error');
       return;
     }
+
+    if (!emailRegex.test(studentForm.email)) {
+      showMessage('Please enter a valid email address (e.g. name@example.com)', 'error');
+      setEmailError(true);
+      return;
+    }
+
     if (!faceDescriptor) {
       showMessage('Please capture student face first', 'error');
       return;
     }
 
     const threshold = 0.45;
-  for (const existing of students) {
-    if (!existing.faceDescriptor) continue;
-    const distance = faceapi.euclideanDistance(
-      faceDescriptor,
-      existing.faceDescriptor
-    );
-    if (distance < threshold) {
-      showMessage(
-        `This face is already registered to ${existing.name} (${existing.regNo}). Each student must use their own face.`,
-        'error'
+    for (const existing of students) {
+      if (!existing.faceDescriptor) continue;
+      const distance = faceapi.euclideanDistance(
+        faceDescriptor,
+        existing.faceDescriptor
       );
-      return;
+      if (distance < threshold) {
+        showMessage(
+          `This face is already registered to ${existing.name} (${existing.regNo}). Each student must use their own face.`,
+          'error'
+        );
+        return;
+      }
     }
-  }
 
-  console.log("REGISTERING WITH PASSWORD:", studentForm.password);
-
-  const result = await addStudent({ ...studentForm, faceDescriptor });
-  if (result.success) {
-    showMessage('Student added successfully!', 'success');
-    setStudents(prev => [...prev, result.student]);
-    setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
-    setFaceDescriptor(null);
-    setFaceCaptured(false);
-  } else {
-    showMessage(result.message ||'Failed to add student', 'error');
-  }
-};
+console.log("SENDING TO BACKEND:", {
+  regNumber: studentForm.regNo,
+  fullName: studentForm.name,
+  email: studentForm.email,
+  course: studentForm.course,
+  year: studentForm.year,
+  password: studentForm.password,
+  faceDescriptor: faceDescriptor ? 'present' : 'MISSING'
+});
+    const result = await addStudent({ ...studentForm, faceDescriptor });
+if (result.success) {
+  setStudents(prev => [...prev, {
+    id: Date.now(),
+    name: studentForm.name,
+    regNo: studentForm.regNo,
+    year: studentForm.year,
+    email: studentForm.email,
+    course: studentForm.course,
+    hasVoted: false,
+  }]);
+  setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
+  setFaceDescriptor(null);
+  setFaceCaptured(false);
+  setEmailError(false);
+  setTimeout(() => showMessage('Student added successfully!', 'success'), 100);
+} else {
+  showMessage(result.message || 'Failed to add student', 'error');
+}
+  };
 
   const handleEditStudent = async (studentId) => {
     if (!editForm.name) {
       showMessage('Please enter a name', 'error');
       return;
     }
+
+    if (editForm.email && !emailRegex.test(editForm.email)) {
+      showMessage('Please enter a valid email address (e.g. name@example.com)', 'error');
+      setEditEmailError(true);
+      return;
+    }
+
     const updateData = {
       name: editForm.name,
       email: editForm.email,
@@ -254,18 +287,18 @@ const Students = () => {
   };
 
   const handleResetPassword = async (student) => {
-  const tempPassword = Math.random().toString(36).slice(-8).toUpperCase();
-  const result = await updateStudent(student.id, {
-    password: tempPassword,
-    isFirstLogin: true,
-  });
-  if (result.success) {
-    showMessage(`Password reset. Temp password: ${tempPassword} — share with ${student.name} securely`, 'success');
-    setShowResetConfirm(null);
-  } else {
-    showMessage('Failed to reset password', 'error');
-  }
-};
+    const tempPassword = Math.random().toString(36).slice(-8).toUpperCase();
+    const result = await updateStudent(student.id, {
+      password: tempPassword,
+      isFirstLogin: true,
+    });
+    if (result.success) {
+      showMessage(`Password reset. Temp password: ${tempPassword} — share with ${student.name} securely`, 'success');
+      setShowResetConfirm(null);
+    } else {
+      showMessage('Failed to reset password', 'error');
+    }
+  };
 
   const filteredStudents = students
     .filter(s => {
@@ -331,12 +364,16 @@ const Students = () => {
 
               <div className="form-group">
                 <input
-                  type="email"
-                  className="form-input"
-                  placeholder="Email Address"
-                  value={studentForm.email}
-                  onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
-                />
+  type="email"
+  className={`form-input ${emailError ? 'input-error' : ''}`}
+  placeholder="Email Address"
+  value={studentForm.email}
+  onChange={(e) => {
+    const val = e.target.value;
+    setStudentForm({ ...studentForm, email: val });
+    setEmailError(val.length > 0 && !emailRegex.test(val));
+  }}
+/>
               </div>
 
               <div className="form-group">
@@ -450,9 +487,12 @@ const Students = () => {
                 )}
               </div>
 
-              <button className="btn btn-primary" onClick={handleAddStudent}>
-                ADD STUDENT
-              </button>
+              {message && (
+  <div className={`alert alert-${messageType}`}>{message}</div>
+)}
+<button className="btn btn-primary" onClick={handleAddStudent}>
+  ADD STUDENT
+</button>
             </div>
 
             <div className="admin-section">
@@ -532,13 +572,17 @@ const Students = () => {
                                     style={{ padding: '6px', fontSize: '0.85rem' }}
                                   />
                                   <input
-                                    type="email"
-                                    className="form-input"
-                                    placeholder="Email"
-                                    value={editForm.email}
-                                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                                    style={{ padding: '6px', fontSize: '0.85rem' }}
-                                  />
+  type="email"
+  className={`form-input ${editEmailError ? 'input-error' : ''}`}
+  placeholder="Email"
+  value={editForm.email}
+  onChange={(e) => {
+    const val = e.target.value;
+    setEditForm({ ...editForm, email: val });
+    setEditEmailError(val.length > 0 && !emailRegex.test(val));
+  }}
+  style={{ padding: '6px', fontSize: '0.85rem' }}
+/>
                                   <input
                                     type="text"
                                     className="form-input"
@@ -602,7 +646,7 @@ const Students = () => {
 
                                   <button
                                     className="action-btn reset-btn"
-                                    title="Reset Password to Reg Number"
+                                    title="Reset Password"
                                     onClick={() => setShowResetConfirm(student.id)}
                                   >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -630,7 +674,6 @@ const Students = () => {
                               </div>
                             )}
 
-                            {/* ✅ DELETE CONFIRM — inside map */}
                             {showDeleteConfirm === student.id && (
                               <div className="delete-confirm">
                                 <p>Delete <strong>{student.name}</strong>?</p>
@@ -651,10 +694,9 @@ const Students = () => {
                               </div>
                             )}
 
-                            {/* ✅ RESET CONFIRM — inside map, student is in scope here */}
                             {showResetConfirm === student.id && (
                               <div className="delete-confirm">
-                                <p>Reset <strong>{student.name}</strong>'s password to their reg number?</p>
+                                <p>Reset <strong>{student.name}</strong>'s password?</p>
                                 <p style={{ fontSize: '0.8rem', color: '#888' }}>
                                   They will be forced to set a new password on next login.
                                 </p>
@@ -675,7 +717,7 @@ const Students = () => {
                               </div>
                             )}
 
-                          </div> 
+                          </div>
                         ))}
                       </div>
 

@@ -114,20 +114,21 @@ export const addStudent = async (studentData) => {
   })
   const data = await response.json()
   if (response.ok) {
-    return {
-      success: true,
-      message: data.message,
-      student: {
-        id: data._id,
-        name: data.fullName,
-        regNo: data.regNumber,
-        year: data.year,
-        email: data.email,
-        hasVoted: false,
-        faceDescriptor: studentData.faceDescriptor
-      }
+  return {
+    success: true,
+    message: data.message,
+    student: {
+      id: Date.now(),
+      name: studentData.name,
+      regNo: studentData.regNo,
+      year: studentData.year,
+      email: studentData.email,
+      course: studentData.course,
+      hasVoted: false,
+      faceDescriptor: studentData.faceDescriptor
     }
   }
+}
   return { success: false, message: data.message }
 }
 
@@ -284,11 +285,19 @@ export const getCandidates = async (electionId) => {
   const data = await response.json();
   if (response.ok) {
     const election = data.find(e => e._id === electionId);
-    return { success: true, candidates: election?.candidates || [] };
+    const candidates = election?.candidates || [];
+    return { 
+      success: true, 
+      candidates: candidates.map(c => ({
+        id: c._id,
+        name: c.name,
+        position: c.position,
+        party: c.party
+      }))
+    };
   }
   return { success: false, message: data.message };
 };
-
 export const resetAllData = async () => {
   const token = sessionStorage.getItem('token');
   const response = await fetch(`${config.API_URL}/api/admin/reset`, {
@@ -301,3 +310,34 @@ export const resetAllData = async () => {
   }
   return { success: false, message: data.message };
 };
+
+  export const updateCandidate = async (electionId, candidateId, candidateData) => {
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/elections/${electionId}/candidates/${candidateId}`, {
+    method: 'PUT',
+    headers: {
+      ...authHeaders(token),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(candidateData)
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return { success: true, message: data.message };
+  }
+  return { success: false, message: data.message };
+};
+
+export const deleteCandidate = async (electionId, candidateId) => {
+  const token = sessionStorage.getItem('token');
+  const response = await fetch(`${config.API_URL}/api/admin/elections/${electionId}/candidates/${candidateId}`, {
+    method: 'DELETE',
+    headers: authHeaders(token)
+  });
+  const data = await response.json();
+  if (response.ok) {
+    return { success: true, message: data.message };
+  }
+  return { success: false, message: data.message };
+};
+

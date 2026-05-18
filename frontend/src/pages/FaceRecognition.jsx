@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as faceapi from 'face-api.js';
+const faceapi = window.faceapi;
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { verifyFace } from '../services/authService';
