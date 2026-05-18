@@ -221,15 +221,24 @@ console.log("SENDING TO BACKEND:", {
   faceDescriptor: faceDescriptor ? 'present' : 'MISSING'
 });
     const result = await addStudent({ ...studentForm, faceDescriptor });
-    if (result.success) {
-      showMessage('Student added successfully!', 'success');
-      setStudents(prev => [...prev, result.student]);
-      setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
-      setFaceDescriptor(null);
-      setFaceCaptured(false);
-    } else {
-      showMessage(result.message || 'Failed to add student', 'error');
-    }
+if (result.success) {
+  setStudents(prev => [...prev, {
+    id: Date.now(),
+    name: studentForm.name,
+    regNo: studentForm.regNo,
+    year: studentForm.year,
+    email: studentForm.email,
+    course: studentForm.course,
+    hasVoted: false,
+  }]);
+  setStudentForm({ name: '', year: '', email: '', regNo: '', course: '', password: '' });
+  setFaceDescriptor(null);
+  setFaceCaptured(false);
+  setEmailError(false);
+  setTimeout(() => showMessage('Student added successfully!', 'success'), 100);
+} else {
+  showMessage(result.message || 'Failed to add student', 'error');
+}
   };
 
   const handleEditStudent = async (studentId) => {
