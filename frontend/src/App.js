@@ -9,7 +9,6 @@ import CastVote from './pages/CastVote';
 import VoteSubmitted from './pages/VoteSubmitted';
 import Results from './pages/Results';
 import Dashboard from './pages/admin/Dashboard';
-import Students from './pages/admin/Students';
 import WinnerAnnouncement from './pages/WinnerAnnouncement';
 import ChangePassword from './pages/ChangePassword';
 import Elections from './pages/admin/Elections';
