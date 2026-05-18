@@ -110,7 +110,9 @@ const Dashboard = () => {
 
   { label: 'Manage Candidates', path: '/admin/candidates', enabled: true },
 
-  { label: 'Manage Students', path: '/admin/students', enabled: true },
+  { label: 'Add Student', path: '/admin/students/add', enabled: true },
+
+  { label: 'Student List', path: '/admin/students/list', enabled: true },
 
   { label: 'Session Control', path: '/admin/session-control', enabled: true },
 
