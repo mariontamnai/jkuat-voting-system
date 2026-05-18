@@ -367,13 +367,17 @@ body {
 }
 
 .candidate-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border: 2px solid #e0e0e0;
   border-radius: 12px;
-  padding: 20px 15px;
+  padding: 14px 16px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  margin-bottom: 10px;
 }
 
 .tick-mark {
@@ -417,6 +421,28 @@ body {
   margin: 0 auto 12px;
 }
 
+.candidate-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.candidate-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.candidate-position {
+  font-size: 0.82rem;
+  color: #555;
+}
+
+.candidate-party {
+  font-size: 0.78rem;
+  color: #777;
+}
+
 .candidate-card h3 {
   font-size: 0.95rem;
   font-weight: 700;
@@ -433,6 +459,125 @@ body {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.candidate-edit-card {
+  border: 2px solid #2e7d32;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  background: #fff;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.edit-btn:hover {
+  background: #bbdefb;
+}
+
+.save-btn {
+  background: #c8e6c9;
+  color: #2e7d32;
+}
+
+.save-btn:hover {
+  background: #a5d6a7;
+}
+
+.delete-btn {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.delete-btn:hover {
+  background: #ffcdd2;
+}
+
+.cancel-btn {
+  background: #eeeeee;
+  color: #555;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e0;
+}
+
+.delete-confirm {
+  border: 1px solid #ffcdd2;
+  background: #fff5f5;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.empty-text {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+}
+
+.candidate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.warning-text {
+  color: #e53935;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.position-group {
+  margin-bottom: 20px;
+}
+
+.position-header {
+  background: #2e7d32;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.position-count {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
 
 .section-title {
   text-align: center;
