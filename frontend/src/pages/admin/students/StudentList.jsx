@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import Header from '../../../components/Header';
+import Footer from '../../../components/Footer';
 
 import {
   getStudents,
   updateStudent,
   deleteStudent
-} from '../../services/adminService';
+} from '../../../services/adminService';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
-import { getStudents, addStudent } from '../../services/adminService';
+import Header from '../../../components/Header';
+import Footer from '../../../components/Footer';
+import { getStudents, addStudent } from '../../../services/adminService';
 
 const faceapi = window.faceapi;
 
