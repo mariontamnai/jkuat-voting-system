@@ -22,6 +22,8 @@ import SessionControl from './pages/admin/SessionControl';
 import Settings from './pages/admin/Settings';
 import CreateElection from './pages/admin/CreateElection';
 import CreateCandidate from './pages/admin/CreateCandidate';
+import AddStudent from './pages/admin/students/AddStudent';
+import StudentList from './pages/admin/students/StudentList';
 
 
 function App() {
@@ -36,6 +38,8 @@ function App() {
         <Route path="/admin/candidates/create" element={<CreateCandidate />} />
         <Route path="/admin/candidates" element={<Candidates />} />
         <Route path="/admin/candidates/list" element={<CandidatesList />} />
+        <Route path="/admin/students/add" element={<AddStudent />} />
+        <Route path="/admin/students/list" element={<StudentList />} />
         <Route path="/change-password" element={<ChangePassword />} /> 
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
