@@ -354,8 +354,9 @@ const Students = () => {
   placeholder="Email Address"
   value={studentForm.email}
   onChange={(e) => {
-    setStudentForm({ ...studentForm, email: e.target.value });
-    setEmailError(false);
+    const val = e.target.value;
+    setStudentForm({ ...studentForm, email: val });
+    setEmailError(val.length > 0 && !emailRegex);
   }}
 />
               </div>
@@ -558,7 +559,8 @@ const Students = () => {
   placeholder="Email"
   value={editForm.email}
   onChange={(e) => {
-    setEditForm({ ...editForm, email: e.target.value });
+    const val = e.target.value;
+    setEditForm({ ...editForm, email: val });
     setEditEmailError(false);
   }}
   style={{ padding: '6px', fontSize: '0.85rem' }}
