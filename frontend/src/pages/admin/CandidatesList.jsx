@@ -207,59 +207,7 @@ const CandidatesList = () => {
               </div>
             )}
 
-            {/* Select Election */}
-            <div className="admin-section">
-              <h3 className="admin-section-title">
-                Select Election
-              </h3>
-
-              <select
-                className="form-input"
-                value={selectedElection}
-                onChange={(e) => {
-                  setSelectedElection(
-                    e.target.value
-                  );
-
-                  sessionStorage.setItem(
-                    'electionId',
-                    e.target.value
-                  );
-                }}
-              >
-                <option value="">
-                  -- Select an election --
-                </option>
-
-                {elections.map((election) => (
-                  <option
-                    key={election.id}
-                    value={election.id}
-                  >
-                    {election.title} (
-                    {election.status})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Quick Action */}
-            <div
-              className="admin-section"
-              style={{ marginTop: '-10px' }}
-            >
-              <button
-                className="btn btn-primary"
-                onClick={() =>
-                  navigate(
-                    '/admin/candidates/create'
-                  )
-                }
-                disabled={phase !== 'idle'}
-              >
-                + ADD CANDIDATE
-              </button>
-            </div>
+            
 
             {/* Candidates List */}
             {selectedElection && (
