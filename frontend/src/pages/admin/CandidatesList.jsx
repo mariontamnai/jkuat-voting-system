@@ -14,23 +14,28 @@ const CandidatesList = () => {
   const navigate = useNavigate();
 
   const [elections, setElections] = useState([]);
-  const [selectedElection, setSelectedElection] = useState(
-    sessionStorage.getItem('electionId') || ''
-  );
+
+  const [selectedElection, setSelectedElection] =
+    useState(
+      sessionStorage.getItem('electionId') || ''
+    );
 
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('');
+  const [messageType, setMessageType] =
+    useState('');
 
-  const [editingCandidate, setEditingCandidate] = useState(null);
+  const [editingCandidate, setEditingCandidate] =
+    useState(null);
 
-  const [editCandidateForm, setEditCandidateForm] = useState({
-    name: '',
-    position: '',
-    party: ''
-  });
+  const [editCandidateForm, setEditCandidateForm] =
+    useState({
+      name: '',
+      position: '',
+      party: ''
+    });
 
   const [showDeleteConfirm, setShowDeleteConfirm] =
     useState(null);
@@ -40,7 +45,8 @@ const CandidatesList = () => {
   );
 
   const phase =
-    sessionStorage.getItem('adminPhase') || 'idle';
+    sessionStorage.getItem('adminPhase') ||
+    'idle';
 
   useEffect(() => {
     if (!admin) {
@@ -75,7 +81,9 @@ const CandidatesList = () => {
   const loadCandidates = async (electionId) => {
     setLoading(true);
 
-    const result = await getCandidates(electionId);
+    const result = await getCandidates(
+      electionId
+    );
 
     if (result.success) {
       setCandidates(result.candidates);
@@ -108,7 +116,9 @@ const CandidatesList = () => {
     });
   };
 
-  const handleSaveCandidate = async (candidateId) => {
+  const handleSaveCandidate = async (
+    candidateId
+  ) => {
     const result = await updateCandidate(
       selectedElection,
       candidateId,
@@ -124,7 +134,6 @@ const CandidatesList = () => {
       setEditingCandidate(null);
 
       loadCandidates(selectedElection);
-
     } else {
       showMessage(
         result.message ||
@@ -151,7 +160,6 @@ const CandidatesList = () => {
       setShowDeleteConfirm(null);
 
       loadCandidates(selectedElection);
-
     } else {
       showMessage(
         result.message ||
@@ -207,8 +215,6 @@ const CandidatesList = () => {
               </div>
             )}
 
-            
-
             {/* Candidates List */}
             {selectedElection && (
               <div className="admin-section">
@@ -227,13 +233,7 @@ const CandidatesList = () => {
 
                 ) : candidates.length === 0 ? (
 
-                  <p
-                    style={{
-                      textAlign: 'center',
-                      color: '#777',
-                      padding: '20px'
-                    }}
-                  >
+                  <p className="empty-text">
                     No candidates added yet
                   </p>
 
@@ -248,49 +248,229 @@ const CandidatesList = () => {
                     ]) => (
                       <div
                         key={position}
-                        style={{
-                          marginBottom: '20px'
-                        }}
+                        className="position-group"
                       >
-                        <div
-                          style={{
-                            background: '#2e7d32',
-                            color: 'white',
-                            padding:
-                              '8px 15px',
-                            borderRadius: '8px',
-                            fontWeight: '700',
-                            fontSize: '0.85rem',
-                            marginBottom: '8px',
-                            display: 'flex',
-                            justifyContent:
-                              'space-between'
-                          }}
-                        >
-                          <span>{position}</span>
 
-                          <span
-                            style={{
-                              fontSize:
-                                '0.75rem'
-                            }}
-                          >
+                        {/* Position Header */}
+                        <div className="position-header">
+
+                          <span>
+                            {position}
+                          </span>
+
+                          <span className="position-count">
                             {
                               positionCandidates.length
                             }{' '}
-                            candidates
+                            candidate
+                            {positionCandidates.length !==
+                            1
+                              ? 's'
+                              : ''}
                           </span>
+
                         </div>
 
+                        {/* Candidate Cards */}
                         {positionCandidates.map(
                           (c) => (
-                            <div
-                              key={c.id}
-                            >
-                              {/* KEEP YOUR EXISTING EDIT/DELETE CARD UI HERE */}
+                            <div key={c.id}>
+
+                              {editingCandidate ===
+                              c.id ? (
+
+                                <div className="candidate-edit-card">
+
+                                  <input
+                                    className="form-input"
+                                    value={
+                                      editCandidateForm.name
+                                    }
+                                    onChange={(e) =>
+                                      setEditCandidateForm(
+                                        {
+                                          ...editCandidateForm,
+                                          name:
+                                            e
+                                              .target
+                                              .value
+                                        }
+                                      )
+                                    }
+                                    placeholder="Name"
+                                  />
+
+                                  <input
+                                    className="form-input"
+                                    value={
+                                      editCandidateForm.position
+                                    }
+                                    onChange={(e) =>
+                                      setEditCandidateForm(
+                                        {
+                                          ...editCandidateForm,
+                                          position:
+                                            e
+                                              .target
+                                              .value
+                                        }
+                                      )
+                                    }
+                                    placeholder="Position"
+                                  />
+
+                                  <input
+                                    className="form-input"
+                                    value={
+                                      editCandidateForm.party
+                                    }
+                                    onChange={(e) =>
+                                      setEditCandidateForm(
+                                        {
+                                          ...editCandidateForm,
+                                          party:
+                                            e
+                                              .target
+                                              .value
+                                        }
+                                      )
+                                    }
+                                    placeholder="Party"
+                                  />
+
+                                  <div className="action-btns">
+
+                                    <button
+                                      className="action-btn save-btn"
+                                      onClick={() =>
+                                        handleSaveCandidate(
+                                          c.id
+                                        )
+                                      }
+                                    >
+                                      Save
+                                    </button>
+
+                                    <button
+                                      className="action-btn cancel-btn"
+                                      onClick={() =>
+                                        setEditingCandidate(
+                                          null
+                                        )
+                                      }
+                                    >
+                                      Cancel
+                                    </button>
+
+                                  </div>
+
+                                </div>
+
+                              ) : showDeleteConfirm ===
+                                c.id ? (
+
+                                <div className="delete-confirm">
+
+                                  <span>
+                                    Delete{' '}
+                                    <strong>
+                                      {c.name}
+                                    </strong>
+                                    ?
+                                  </span>
+
+                                  <div className="action-btns">
+
+                                    <button
+                                      className="action-btn delete-btn"
+                                      onClick={() =>
+                                        handleDeleteCandidate(
+                                          c.id
+                                        )
+                                      }
+                                    >
+                                      Yes, Delete
+                                    </button>
+
+                                    <button
+                                      className="action-btn cancel-btn"
+                                      onClick={() =>
+                                        setShowDeleteConfirm(
+                                          null
+                                        )
+                                      }
+                                    >
+                                      Cancel
+                                    </button>
+
+                                  </div>
+
+                                </div>
+
+                              ) : (
+
+                                <div className="candidate-card">
+
+                                  <div className="candidate-info">
+
+                                    <p className="candidate-name">
+                                      {c.name}
+                                    </p>
+
+                                    <p className="candidate-position">
+                                      {c.position}
+                                    </p>
+
+                                    {c.party && (
+                                      <p className="candidate-party">
+                                        {c.party}
+                                      </p>
+                                    )}
+
+                                  </div>
+
+                                  <div className="action-btns">
+
+                                    <button
+                                      className="action-btn edit-btn"
+                                      onClick={() =>
+                                        handleEditCandidate(
+                                          c
+                                        )
+                                      }
+                                      disabled={
+                                        phase !==
+                                        'idle'
+                                      }
+                                    >
+                                      Edit
+                                    </button>
+
+                                    <button
+                                      className="action-btn delete-btn"
+                                      onClick={() =>
+                                        setShowDeleteConfirm(
+                                          c.id
+                                        )
+                                      }
+                                      disabled={
+                                        phase !==
+                                        'idle'
+                                      }
+                                    >
+                                      Delete
+                                    </button>
+
+                                  </div>
+
+                                </div>
+
+                              )}
+
                             </div>
                           )
                         )}
+
                       </div>
                     )
                   )

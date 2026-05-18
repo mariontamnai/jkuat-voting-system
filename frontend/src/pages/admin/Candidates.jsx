@@ -8,12 +8,19 @@ const Candidates = () => {
   const navigate = useNavigate();
 
   const [elections, setElections] = useState([]);
-  const [selectedElection, setSelectedElection] = useState(
-    sessionStorage.getItem('electionId') || ''
+
+  const [selectedElection, setSelectedElection] =
+    useState(
+      sessionStorage.getItem('electionId') || ''
+    );
+
+  const admin = JSON.parse(
+    sessionStorage.getItem('admin')
   );
 
-  const admin = JSON.parse(sessionStorage.getItem('admin'));
-  const phase = sessionStorage.getItem('adminPhase') || 'idle';
+  const phase =
+    sessionStorage.getItem('adminPhase') ||
+    'idle';
 
   useEffect(() => {
     if (!admin) {
@@ -30,7 +37,8 @@ const Candidates = () => {
     if (result.success) {
       setElections(result.elections);
 
-      const savedId = sessionStorage.getItem('electionId');
+      const savedId =
+        sessionStorage.getItem('electionId');
 
       if (savedId) {
         setSelectedElection(savedId);
@@ -51,7 +59,9 @@ const Candidates = () => {
             {/* Back Button */}
             <button
               className="back-btn"
-              onClick={() => navigate('/admin/dashboard')}
+              onClick={() =>
+                navigate('/admin/dashboard')
+              }
             >
               ← Back to Dashboard
             </button>
@@ -60,6 +70,7 @@ const Candidates = () => {
 
             {/* Select Election */}
             <div className="admin-section">
+
               <h3 className="admin-section-title">
                 Select Election
               </h3>
@@ -68,8 +79,14 @@ const Candidates = () => {
                 className="form-input"
                 value={selectedElection}
                 onChange={(e) => {
-                  setSelectedElection(e.target.value);
-                  sessionStorage.setItem('electionId', e.target.value);
+                  setSelectedElection(
+                    e.target.value
+                  );
+
+                  sessionStorage.setItem(
+                    'electionId',
+                    e.target.value
+                  );
                 }}
               >
                 <option value="">
@@ -81,53 +98,56 @@ const Candidates = () => {
                     key={election.id}
                     value={election.id}
                   >
-                    {election.title} ({election.status})
+                    {election.title} (
+                    {election.status})
                   </option>
                 ))}
+
               </select>
+
             </div>
 
             {/* Action Buttons */}
             {selectedElection && (
-              <div
-                className="admin-section"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '15px'
-                }}
-              >
-                <button
-                  className="btn btn-primary"
-                  onClick={() =>
-                    navigate('/admin/candidates/create')
-                  }
-                  disabled={phase !== 'idle'}
-                >
-                  + ADD CANDIDATE
-                </button>
 
-                <button
-                  className="btn btn-outline"
-                  onClick={() =>
-                    navigate('/admin/candidates/list')
-                  }
-                >
-                  VIEW ALL CANDIDATES
-                </button>
+              <div className="admin-section">
+
+                <div className="candidate-actions">
+
+                  <button
+                    className="btn btn-primary"
+                    onClick={() =>
+                      navigate(
+                        '/admin/candidates/create'
+                      )
+                    }
+                    disabled={phase !== 'idle'}
+                  >
+                    + ADD CANDIDATE
+                  </button>
+
+                  <button
+                    className="btn btn-outline"
+                    onClick={() =>
+                      navigate(
+                        '/admin/candidates/list'
+                      )
+                    }
+                  >
+                    VIEW ALL CANDIDATES
+                  </button>
+
+                </div>
 
                 {phase !== 'idle' && (
-                  <p
-                    style={{
-                      color: '#e53935',
-                      fontSize: '0.85rem',
-                      textAlign: 'center'
-                    }}
-                  >
-                    Cannot modify candidates while a session is active
+                  <p className="warning-text">
+                    Cannot modify candidates
+                    while a session is active
                   </p>
                 )}
+
               </div>
+
             )}
 
           </div>
