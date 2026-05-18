@@ -78,7 +78,6 @@ export const getStudents = async () => {
         year: s.year,
         email: s.email,
         hasVoted: s.hasVoted,
-        faceDescriptor: s.faceDescriptor
       }))
     }
   }
@@ -99,7 +98,7 @@ export const addStudent = async (studentData) => {
   
   // Create AbortController for timeout
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
 
   try {
     const response = await fetch(`${config.API_URL}/api/admin/students`, {
@@ -121,23 +120,13 @@ export const addStudent = async (studentData) => {
     });
     
     clearTimeout(timeoutId);
-    
     const data = await response.json();
     
     if (response.ok) {
       return {
         success: true,
         message: data.message || 'Student added successfully',
-        student: {
-          id: data.student?._id || Date.now(),
-          name: studentData.name,
-          regNo: studentData.regNo,
-          year: studentData.year,
-          email: studentData.email,
-          course: studentData.course,
-          hasVoted: false,
-          faceDescriptor: studentData.faceDescriptor
-        }
+        student: data.student
       }
     }
     
@@ -148,9 +137,15 @@ export const addStudent = async (studentData) => {
   } catch (error) {
     clearTimeout(timeoutId);
     if (error.name === 'AbortError') {
-      return { success: false, message: 'Request timeout. Server is taking too long to respond.' };
+      return { 
+        success: false, 
+        message: 'Server is taking too long to respond. Please check your connection and try again.' 
+      };
     }
-    return { success: false, message: error.message || 'Failed to add student' };
+    return { 
+      success: false, 
+      message: error.message || 'Network error - could not connect to server' 
+    };
   }
 };
 

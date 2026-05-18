@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
-import { getStudents, addStudent } from '../../../services/adminService';
+import { addStudent } from '../../../services/adminService'; // ✅ removed unused getStudents
 
 const faceapi = window.faceapi;
 
@@ -18,13 +18,10 @@ const AddStudent = () => {
   const [faceDescriptor, setFaceDescriptor] = useState(null);
   const [faceCaptured, setFaceCaptured] = useState(false);
   const [capturing, setCapturing] = useState(false);
-  const [adding, setAdding] = useState(false); // NEW: loading state for add button
-  const [students, setStudents] = useState([]);
+  const [adding, setAdding] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [emailError, setEmailError] = useState(false);
-  const [addProgress, setAddProgress] = useState('');
-
 
   const [studentForm, setStudentForm] = useState({
     name: '',
@@ -47,22 +44,15 @@ const AddStudent = () => {
 
   const admin = JSON.parse(sessionStorage.getItem('admin'));
 
+  // ✅ Preload models on mount so they're ready when camera opens
   useEffect(() => {
     if (!admin) {
       navigate('/admin-login');
       return;
     }
 
-    loadStudents();
+    loadModels();
   }, []);
-
-  const loadStudents = async () => {
-    const result = await getStudents();
-
-    if (result.success) {
-      setStudents(result.students);
-    }
-  };
 
   const showMessage = (msg, type) => {
     setMessage(msg);
@@ -74,6 +64,8 @@ const AddStudent = () => {
   };
 
   const loadModels = async () => {
+    if (modelsLoadedRef.current) return; // already loaded, skip
+
     const MODEL_URL = '/models';
 
     await Promise.all([
@@ -88,8 +80,9 @@ const AddStudent = () => {
 
   const openCamera = async () => {
     try {
+      // ✅ Models already loading/loaded from mount — just wait if still in progress
       if (!modelsLoadedRef.current) {
-        showMessage('Loading face detection models...', 'success');
+        showMessage('Loading face detection models...', 'info');
         await loadModels();
       }
 
@@ -97,8 +90,8 @@ const AddStudent = () => {
         video: {
           width: { ideal: 1280 },
           height: { ideal: 720 },
-          facingMode: 'user'
-        }
+          facingMode: 'user',
+        },
       });
 
       setCameraOpen(true);
@@ -140,7 +133,7 @@ const AddStudent = () => {
 
   const closeCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
 
@@ -162,7 +155,7 @@ const AddStudent = () => {
     setCapturing(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // ✅ Removed artificial 500ms delay — no reason to wait
 
       const detection = await faceapi
         .detectSingleFace(videoRef.current, detectorOptions)
@@ -190,74 +183,64 @@ const AddStudent = () => {
   };
 
   const handleAddStudent = async () => {
-  if (
-    !studentForm.name ||
-    !studentForm.year ||
-    !studentForm.email ||
-    !studentForm.regNo ||
-    !studentForm.course ||
-    !studentForm.password
-  ) {
-    showMessage('Please fill in all fields', 'error');
-    return;
-  }
-
-  if (!emailRegex.test(studentForm.email)) {
-    showMessage('Please enter a valid email address', 'error');
-    setEmailError(true);
-    return;
-  }
-
-  if (!faceDescriptor) {
-    showMessage('Please capture student face first', 'error');
-    return;
-  }
-
-  const threshold = 0.45;
-  for (const existing of students) {
-    if (!existing.faceDescriptor) continue;
-    const distance = faceapi.euclideanDistance(faceDescriptor, existing.faceDescriptor);
-    if (distance < threshold) {
-      showMessage(`This face already belongs to ${existing.name}`, 'error');
+    if (
+      !studentForm.name ||
+      !studentForm.year ||
+      !studentForm.email ||
+      !studentForm.regNo ||
+      !studentForm.course ||
+      !studentForm.password
+    ) {
+      showMessage('Please fill in all fields', 'error');
       return;
     }
-  }
 
-  setAdding(true);  
+    if (!emailRegex.test(studentForm.email)) {
+      showMessage('Please enter a valid email address', 'error');
+      setEmailError(true);
+      return;
+    }
 
-  try {
-    const result = await addStudent({
-      ...studentForm,
-      faceDescriptor
-    });
+    if (!faceDescriptor) {
+      showMessage('Please capture student face first', 'error');
+      return;
+    }
 
-    if (result && result.success) {
-      setStudentForm({
-        name: '',
-        year: '',
-        email: '',
-        regNo: '',
-        course: '',
-        password: '',
+    setAdding(true);
+
+    try {
+      const result = await addStudent({
+        ...studentForm,
+        faceDescriptor,
       });
 
-      setFaceDescriptor(null);
-      setFaceCaptured(false);
-      setEmailError(false);
+      if (result && result.success) {
+        setStudentForm({
+          name: '',
+          year: '',
+          email: '',
+          regNo: '',
+          course: '',
+          password: '',
+        });
 
-      showMessage('Student added successfully!', 'success');
-      await loadStudents();
-      
-    } else {
-      showMessage(result?.message || 'Failed to add student', 'error');
+        setFaceDescriptor(null);
+        setFaceCaptured(false);
+        setEmailError(false);
+
+        showMessage('Student added successfully!', 'success');
+
+      } else {
+        showMessage(result?.message || 'Failed to add student', 'error');
+      }
+    } catch (error) {
+      console.error('Add student error:', error);
+      showMessage('An error occurred while adding student', 'error');
+    } finally {
+      setAdding(false);
     }
-  } catch (error) {
-    console.error('Add student error:', error);
-    showMessage('An error occurred while adding student', 'error');
-  } finally {
-    setAdding(false);  
-  }
-};
+  };
+
   return (
     <div className="voting-system">
       <div className="bg-animation" />
@@ -268,7 +251,6 @@ const AddStudent = () => {
         <div className="screen-container">
           <div className="card admin-container">
 
-            {/* Header with Back button and title only */}
             <div className="page-top">
               <button
                 className="back-btn"
@@ -295,10 +277,7 @@ const AddStudent = () => {
                   placeholder="Full Name"
                   value={studentForm.name}
                   onChange={(e) =>
-                    setStudentForm({
-                      ...studentForm,
-                      name: e.target.value
-                    })
+                    setStudentForm({ ...studentForm, name: e.target.value })
                   }
                 />
               </div>
@@ -310,10 +289,7 @@ const AddStudent = () => {
                   placeholder="Year"
                   value={studentForm.year}
                   onChange={(e) =>
-                    setStudentForm({
-                      ...studentForm,
-                      year: e.target.value
-                    })
+                    setStudentForm({ ...studentForm, year: e.target.value })
                   }
                 />
               </div>
@@ -326,15 +302,8 @@ const AddStudent = () => {
                   value={studentForm.email}
                   onChange={(e) => {
                     const val = e.target.value;
-
-                    setStudentForm({
-                      ...studentForm,
-                      email: val
-                    });
-
-                    setEmailError(
-                      val.length > 0 && !emailRegex.test(val)
-                    );
+                    setStudentForm({ ...studentForm, email: val });
+                    setEmailError(val.length > 0 && !emailRegex.test(val));
                   }}
                 />
               </div>
@@ -346,10 +315,7 @@ const AddStudent = () => {
                   placeholder="Registration Number"
                   value={studentForm.regNo}
                   onChange={(e) =>
-                    setStudentForm({
-                      ...studentForm,
-                      regNo: e.target.value
-                    })
+                    setStudentForm({ ...studentForm, regNo: e.target.value })
                   }
                 />
               </div>
@@ -361,10 +327,7 @@ const AddStudent = () => {
                   placeholder="Course"
                   value={studentForm.course}
                   onChange={(e) =>
-                    setStudentForm({
-                      ...studentForm,
-                      course: e.target.value
-                    })
+                    setStudentForm({ ...studentForm, course: e.target.value })
                   }
                 />
               </div>
@@ -377,10 +340,7 @@ const AddStudent = () => {
                     placeholder="Password"
                     value={studentForm.password}
                     onChange={(e) =>
-                      setStudentForm({
-                        ...studentForm,
-                        password: e.target.value
-                      })
+                      setStudentForm({ ...studentForm, password: e.target.value })
                     }
                   />
 
@@ -435,7 +395,6 @@ const AddStudent = () => {
                         muted
                         className="webcam"
                       />
-
                       <div className={`face-overlay ${faceDetectedAdmin ? 'detected' : ''}`} />
                     </div>
 
@@ -492,31 +451,30 @@ const AddStudent = () => {
               </div>
 
               <button
-  className="btn btn-primary submit-btn"
-  onClick={handleAddStudent}
-  disabled={adding}
->
-  {adding ? (
-    <>
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', animation: 'spin 1s linear infinite' }}>
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 6v6l4 2" />
-      </svg>
-      ADDING STUDENT...
-    </>
-  ) : (
-    <>
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px' }}>
-        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-        <polyline points="17 21 17 13 7 13 7 21" />
-        <polyline points="7 3 7 8 15 8" />
-      </svg>
-      ADD STUDENT
-    </>
-  )}
-</button>
+                className="btn btn-primary submit-btn"
+                onClick={handleAddStudent}
+                disabled={adding}
+              >
+                {adding ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px', animation: 'spin 1s linear infinite' }}>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                    ADDING STUDENT...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '6px' }}>
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                      <polyline points="17 21 17 13 7 13 7 21" />
+                      <polyline points="7 3 7 8 15 8" />
+                    </svg>
+                    ADD STUDENT
+                  </>
+                )}
+              </button>
 
-              {/* View Registered Students Button - at the bottom */}
               <div className="view-students-container">
                 <Link to="/admin/students/list" className="btn btn-outline view-students-btn">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>

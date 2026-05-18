@@ -105,16 +105,16 @@ const StudentList = () => {
   };
 
   const handleDeleteStudent = async (studentId) => {
-  const result = await deleteStudent(studentId);
-  
-  if (result.success) {
-    showMessage('Student deleted successfully!', 'success');
-    await loadStudents(); 
-    setShowDeleteConfirm(null);
-  } else {
-    showMessage(result.message || 'Failed to delete student', 'error');
-  }
-};
+    const result = await deleteStudent(studentId);
+    
+    if (result.success) {
+      showMessage('Student deleted successfully!', 'success');
+      await loadStudents(); 
+      setShowDeleteConfirm(null);
+    } else {
+      showMessage(result.message || 'Failed to delete student', 'error');
+    }
+  };
 
   const handleResetPassword = async (student) => {
     const tempPassword = Math.random()
@@ -134,6 +134,8 @@ const StudentList = () => {
       );
 
       setShowResetConfirm(null);
+    } else {
+      showMessage('Failed to reset password', 'error');
     }
   };
 
@@ -296,7 +298,72 @@ const StudentList = () => {
                                 </button>
                               </div>
                             </>
+                          ) : showDeleteConfirm === student.id ? (
+                            // Delete Confirmation Mode - Full width row
+                            <>
+                              <div className="edit-cell">
+                                <span>{student.name}</span>
+                              </div>
+                              <div className="edit-cell">
+                                <span>{student.regNo}</span>
+                              </div>
+                              <div className="edit-cell">
+                                <span>{student.year}</span>
+                              </div>
+                              <div className="edit-cell">
+                                <span className={student.hasVoted ? 'voted-yes' : 'voted-no'}>
+                                  {student.hasVoted ? '✓ Voted' : '✗ Not Voted'}
+                                </span>
+                              </div>
+                              <div className="action-btns">
+                                <button
+                                  className="action-btn delete-confirm-btn"
+                                  onClick={() => handleDeleteStudent(student.id)}
+                                >
+                                  Confirm
+                                </button>
+                                <button
+                                  className="action-btn cancel-btn"
+                                  onClick={() => setShowDeleteConfirm(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </>
+                          ) : showResetConfirm === student.id ? (
+                            // Reset Password Confirmation Mode
+                            <>
+                              <div className="edit-cell">
+                                <span>{student.name}</span>
+                              </div>
+                              <div className="edit-cell">
+                                <span>{student.regNo}</span>
+                              </div>
+                              <div className="edit-cell">
+                                <span>{student.year}</span>
+                              </div>
+                              <div className="edit-cell">
+                                <span className={student.hasVoted ? 'voted-yes' : 'voted-no'}>
+                                  {student.hasVoted ? '✓ Voted' : '✗ Not Voted'}
+                                </span>
+                              </div>
+                              <div className="action-btns">
+                                <button
+                                  className="action-btn reset-confirm-btn"
+                                  onClick={() => handleResetPassword(student)}
+                                >
+                                  Confirm Reset
+                                </button>
+                                <button
+                                  className="action-btn cancel-btn"
+                                  onClick={() => setShowResetConfirm(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </>
                           ) : (
+                            // Normal View Mode
                             <>
                               <span>{student.name}</span>
                               <span>{student.regNo}</span>
@@ -330,14 +397,13 @@ const StudentList = () => {
                                   Reset
                                 </button>
 
-                               {showDeleteConfirm === student.id ? (
-  <div className="action-btns">
-    <button className="action-btn delete-confirm-btn" onClick={() => handleDeleteStudent(student.id)}>Confirm</button>
-    <button className="action-btn cancel-btn" onClick={() => setShowDeleteConfirm(null)}>Cancel</button>
-  </div>
-) : (
-  <button className="action-btn delete-btn" onClick={() => setShowDeleteConfirm(student.id)}>Delete</button>
-)} 
+                                <button
+                                  className="action-btn delete-btn"
+                                  title="Delete Student"
+                                  onClick={() => setShowDeleteConfirm(student.id)}
+                                >
+                                  Delete
+                                </button>
                               </div>
                             </>
                           )}
