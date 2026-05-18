@@ -1372,3 +1372,175 @@ select.form-input {
     font-size: 0.8rem;
   }
 }
+
+/* ================================================ */
+/* ADDITIONS FOR AddStudent COMPONENT UI FIXES     */
+/* ================================================ */
+
+/* Page top header with three elements (Back, Title, View Students) */
+.page-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.page-top h2 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.back-btn {
+  order: 1;
+  margin-bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.page-top h2 {
+  order: 2;
+}
+
+.view-students-btn {
+  order: 3;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+}
+
+/* Password wrapper with eye icon */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 48px;
+}
+
+.eye-icon-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s, color 0.2s;
+  color: #777;
+}
+
+.eye-icon-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #2e7d32;
+}
+
+.eye-icon-btn svg {
+  display: block;
+}
+
+/* Button icon alignment */
+.open-camera-btn,
+.capture-btn,
+.cancel-btn,
+.submit-btn,
+.view-students-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Face capture success alert with icon alignment */
+.face-success {
+  display: flex;
+  align-items: center;
+}
+
+/* Spinning animation for capture button */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Camera button group spacing */
+.face-capture-container .button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.face-capture-container .button-group .btn {
+  flex: 1;
+}
+
+/* Full width submit button */
+.submit-btn {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Mobile responsive adjustments for the new header layout */
+@media (max-width: 768px) {
+  .page-top {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .page-top h2 {
+    order: 2;
+  }
+  
+  .view-students-btn {
+    order: 3;
+  }
+  
+  .back-btn {
+    order: 1;
+  }
+}
+
+/* Ensure camera status styles are consistent */
+.camera-status {
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+.status-success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-waiting {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+/* Input error state */
+.input-error {
+  border-color: #dc3545 !important;
+  background-color: #fff8f8 !important;
+}
+
+.input-error:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+}
