@@ -106,13 +106,22 @@ const Dashboard = () => {
   };
 
   const navCards = [
-    { label: 'Manage Elections', path: '/admin/elections', enabled: true },
-    { label: 'Manage Candidates', path: '/admin/candidates', enabled: true },
-    { label: 'Manage Students', path: '/admin/students', enabled: true },
-    { label: 'View Results', path: '/results', enabled: phase === 'counting' || phase === 'published' },
-    { label: 'View Winner', path: '/winner', enabled: phase === 'published' },
-    { label: 'Audit Logs', path: '/admin/audit-logs', enabled: true },
-  ];
+  { label: 'Manage Elections', path: '/admin/elections', enabled: true },
+
+  { label: 'Manage Candidates', path: '/admin/candidates', enabled: true },
+
+  { label: 'Manage Students', path: '/admin/students', enabled: true },
+
+  { label: 'Session Control', path: '/admin/session-control', enabled: true },
+
+  { label: 'System Settings', path: '/admin/settings', enabled: true },
+
+  { label: 'View Results', path: '/results', enabled: phase === 'counting' || phase === 'published' },
+
+  { label: 'View Winner', path: '/winner', enabled: phase === 'published' },
+
+  { label: 'Audit Logs', path: '/admin/audit-logs', enabled: true },
+];
   
 
   return (
@@ -180,56 +189,16 @@ const Dashboard = () => {
                   )}
                 </div>
 
-                {/* Session Control */}
-                <div className="admin-section">
-                  <h3 className="admin-section-title">Session Control</h3>
-                  <div className="button-group">
-                    <button
-                      className="btn btn-primary"
-                      onClick={handleStartSession}
-                      disabled={phase !== 'idle'}
-                    >
-                       START VOTING SESSION
-                    </button>
-                    <button
-                      className="btn btn-outline"
-                      onClick={handleEndSession}
-                      disabled={phase !== 'voting'}
-                    >
-                       END VOTING SESSION
-                    </button>
-                    <button
-                      className="btn btn-primary"
-                      onClick={handlePublishResults}
-                      disabled={phase !== 'counting'}
-                    >
-                       PUBLISH RESULTS
-                    </button>
-                  </div>
-                </div>
-
-                {/* Danger Zone */}
-                <div className="admin-section">
-                  <h3 className="admin-section-title">Danger Zone</h3>
-                  <div className="button-group">
-                    <button
-                      className="btn btn-danger"
-                      onClick={handleResetData}
-                      disabled={phase === 'voting'}
-                    >
-                       RESET ALL DATA
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => {
-                        sessionStorage.clear();
-                        navigate('/');
-                      }}
-                    >
-                      LOGOUT
-                    </button>
-                  </div>
-                </div>
+                <button
+  className="btn btn-outline"
+  onClick={() => {
+    sessionStorage.clear();
+    navigate('/');
+  }}
+>
+  LOGOUT
+</button>
+                
               </>
             )}
           </div>

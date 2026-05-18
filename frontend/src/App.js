@@ -18,6 +18,8 @@ import CandidatesList from './pages/admin/CandidatesList';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import AuditLogs from './pages/admin/AuditLogs';
+import SessionControl from './pages/admin/SessionControl';
+import Settings from './pages/admin/Settings';
 
 
 
@@ -39,6 +41,8 @@ function App() {
         <Route path="/vote-submitted" element={<VoteSubmitted />} />
         <Route path="/results" element={<Results />} />
         <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/session-control" element={<SessionControl />} />
+        <Route path="/admin/settings" element={<Settings />} />
         <Route path="/admin/students" element={<Students />} />
         <Route path="/admin/audit-logs" element={<AuditLogs />} />
         <Route path="/winner" element={<WinnerAnnouncement />} />
