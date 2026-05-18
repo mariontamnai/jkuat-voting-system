@@ -20,7 +20,7 @@ import ResetPassword from './pages/ResetPassword';
 import AuditLogs from './pages/admin/AuditLogs';
 import SessionControl from './pages/admin/SessionControl';
 import Settings from './pages/admin/Settings';
-
+import CreateElection from './pages/admin/CreateElection';
 
 
 function App() {
