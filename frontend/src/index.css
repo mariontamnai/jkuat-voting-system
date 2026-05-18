@@ -370,14 +370,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 2px solid #e0e0e0;
+  border: 1px solid #dfe5df;
   border-radius: 12px;
-  padding: 14px 16px;
-  text-align: center;
+  padding: 18px 20px;
+  text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  margin-bottom: 10px;
 }
 
 .tick-mark {
@@ -399,6 +398,7 @@ body {
 .candidate-card:hover {
   border-color: #2e7d32;
   background-color: #f1f8e9;
+  transform: translateY(-1px);
 }
 
 .candidate-card.selected {
@@ -424,19 +424,18 @@ body {
 .candidate-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  align-items: flex-start;
+  flex: 1;
 }
 
 .candidate-name {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #222;
 }
 
-.candidate-position {
-  font-size: 0.82rem;
-  color: #555;
-}
+
 
 .candidate-party {
   font-size: 0.78rem;
@@ -464,7 +463,6 @@ body {
   border: 2px solid #2e7d32;
   border-radius: 12px;
   padding: 14px;
-  margin-bottom: 10px;
   background: #fff;
 
   display: flex;
@@ -472,21 +470,7 @@ body {
   gap: 10px;
 }
 
-.action-btns {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-.action-btn {
-  border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
 
 .edit-btn {
   background: #e3f2fd;
@@ -529,11 +513,11 @@ body {
   background: #fff5f5;
   border-radius: 12px;
   padding: 14px;
-  margin-bottom: 10px;
 
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .empty-text {
@@ -556,8 +540,9 @@ body {
 }
 
 .position-group {
-  margin-bottom: 20px;
-}
+  display: flex;
+  flex-direction: column;
+  gap: 10px;}
 
 .position-header {
   background: #2e7d32;
@@ -1167,6 +1152,28 @@ select.form-input {
 
 /* ─── Mobile Responsive ───────────────────────────── */
 
+@media (max-width: 768px) {
+
+  .candidate-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .action-btns {
+    width: 100%;
+  }
+
+  .action-btn {
+    flex: 1;
+  }
+
+  .position-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
 @media (max-width: 480px) {
   .container {
     padding: 10px;

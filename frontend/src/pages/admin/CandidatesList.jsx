@@ -417,9 +417,7 @@ const CandidatesList = () => {
                                       {c.name}
                                     </p>
 
-                                    <p className="candidate-position">
-                                      {c.position}
-                                    </p>
+                                    
 
                                     {c.party && (
                                       <p className="candidate-party">
