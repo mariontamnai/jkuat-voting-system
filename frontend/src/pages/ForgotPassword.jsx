@@ -12,6 +12,7 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [emailError, setEmailError] = useState(false);
 
   const handleSubmit = async () => {
     if (!regNumber || !email) {
@@ -21,6 +22,7 @@ const ForgotPassword = () => {
 
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address (e.g. name@example.com)');
+      setEmailError(true);
       return;
     }
 
@@ -79,12 +81,15 @@ const ForgotPassword = () => {
                 <div className="form-group">
                   <label className="form-label">EMAIL ADDRESS</label>
                   <input
-                    type="email"
-                    className="form-input"
-                    placeholder="Enter your email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+  type="email"
+  className={`form-input ${emailError ? 'input-error' : ''}`}
+  placeholder="Enter your email address"
+  value={email}
+  onChange={(e) => {
+    setEmail(e.target.value);
+    setEmailError(false); // clear red when they start typing
+  }}
+/>
                 </div>
 
                 <div className="button-group">

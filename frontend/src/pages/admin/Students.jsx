@@ -27,6 +27,8 @@ const Students = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [emailError, setEmailError] = useState(false);
+  const [editEmailError, setEditEmailError] = useState(false);
   const [studentForm, setStudentForm] = useState({
     name: '',
     year: '',
@@ -183,9 +185,9 @@ const Students = () => {
       return;
     }
 
-    // ✅ EMAIL VALIDATION
     if (!emailRegex.test(studentForm.email)) {
       showMessage('Please enter a valid email address (e.g. name@example.com)', 'error');
+      setEmailError(true);
       return;
     }
 
@@ -230,9 +232,9 @@ const Students = () => {
       return;
     }
 
-    // ✅ EMAIL VALIDATION ON EDIT
     if (editForm.email && !emailRegex.test(editForm.email)) {
       showMessage('Please enter a valid email address (e.g. name@example.com)', 'error');
+      setEditEmailError(true);
       return;
     }
 
@@ -347,12 +349,15 @@ const Students = () => {
 
               <div className="form-group">
                 <input
-                  type="email"
-                  className="form-input"
-                  placeholder="Email Address"
-                  value={studentForm.email}
-                  onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
-                />
+  type="email"
+  className={`form-input ${emailError ? 'input-error' : ''}`}
+  placeholder="Email Address"
+  value={studentForm.email}
+  onChange={(e) => {
+    setStudentForm({ ...studentForm, email: e.target.value });
+    setEmailError(false);
+  }}
+/>
               </div>
 
               <div className="form-group">
@@ -548,13 +553,16 @@ const Students = () => {
                                     style={{ padding: '6px', fontSize: '0.85rem' }}
                                   />
                                   <input
-                                    type="email"
-                                    className="form-input"
-                                    placeholder="Email"
-                                    value={editForm.email}
-                                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                                    style={{ padding: '6px', fontSize: '0.85rem' }}
-                                  />
+  type="email"
+  className={`form-input ${editEmailError ? 'input-error' : ''}`}
+  placeholder="Email"
+  value={editForm.email}
+  onChange={(e) => {
+    setEditForm({ ...editForm, email: e.target.value });
+    setEditEmailError(false);
+  }}
+  style={{ padding: '6px', fontSize: '0.85rem' }}
+/>
                                   <input
                                     type="text"
                                     className="form-input"
