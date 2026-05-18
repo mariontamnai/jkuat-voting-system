@@ -150,7 +150,7 @@ const SessionControl = () => {
             <div style={{ marginTop: '20px' }}>
               <button
                 className="btn btn-outline"
-                onClick={() => navigate('/admin-dashboard')}
+                onClick={() => navigate('/admin/dashboard')}
               >
                 BACK TO DASHBOARD
               </button>
