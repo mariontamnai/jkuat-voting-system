@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
@@ -96,6 +96,7 @@ const StudentList = () => {
       );
 
       setEditingStudent(null);
+      setEditForm({ name: '', email: '', year: '', course: '', resetPassword: '' });
 
     } else {
       showMessage('Failed to update student', 'error');
@@ -164,6 +165,7 @@ const StudentList = () => {
         <div className="screen-container">
           <div className="card admin-container">
 
+            {/* Header with only Back button and title - NO Add button */}
             <div className="page-top">
               <button
                 className="back-btn"
@@ -173,12 +175,6 @@ const StudentList = () => {
               </button>
 
               <h2>Registered Students</h2>
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <Link to="/admin/students/add" className="btn btn-primary">
-                + Add New Student
-              </Link>
             </div>
 
             {message && (
@@ -240,12 +236,7 @@ const StudentList = () => {
               ) : (
                 <>
                   <div className="students-table">
-                    <div
-                      className="students-table-header"
-                      style={{
-                        gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr'
-                      }}
-                    >
+                    <div className="students-table-header">
                       <span>Name</span>
                       <span>Reg No</span>
                       <span>Year</span>
@@ -253,82 +244,130 @@ const StudentList = () => {
                       <span>Actions</span>
                     </div>
 
-                    {paginatedStudents.map((student, index) => (
-                      <div
-                        key={index}
-                        className="students-table-row"
-                        style={{
-                          gridTemplateColumns: '2fr 2fr 1fr 1fr 1fr'
-                        }}
-                      >
-                      <span>{student.name}</span>
-                        <span>{student.regNo}</span>
-                        <span>{student.year}</span>
-
-                        <span>
-                          {student.hasVoted ? '✓' : '✗'}
-                        </span>
-
-                        <div className="action-btns">
-                          <button
-                            className="action-btn edit-btn"
-                            title="Edit Student"
-                            onClick={() => {
-                              setEditingStudent(student.id);
-
-                              setEditForm({
-                                name: student.name,
-                                email: student.email || '',
-                                year: student.year || '',
-                                course: student.course || '',
-                                resetPassword: ''
-                              });
-                            }}
-                          >
-                            Edit
-                          </button>
-
-                          <button
-                            className="action-btn reset-btn"
-                            title="Reset Password"
-                            onClick={() => setShowResetConfirm(student.id)}
-                          >
-                            Reset
-                          </button>
-
-                          <button
-                            className="action-btn delete-btn"
-                            title="Delete Student"
-                            onClick={() => setShowDeleteConfirm(student.id)}
-                          >
-                            Delete
-                          </button>
-                        </div>
+                    {paginatedStudents.length === 0 ? (
+                      <div className="empty-text">
+                        No students found
                       </div>
-                    ))}
+                    ) : (
+                      paginatedStudents.map((student) => (
+                        <div key={student.id} className="students-table-row">
+                          {/* Edit Mode */}
+                          {editingStudent === student.id ? (
+                            <>
+                              <div className="edit-cell">
+                                <input
+                                  type="text"
+                                  className="form-input edit-input"
+                                  value={editForm.name}
+                                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                  placeholder="Name"
+                                />
+                              </div>
+                              <div className="edit-cell">
+                                <span>{student.regNo}</span>
+                              </div>
+                              <div className="edit-cell">
+                                <input
+                                  type="text"
+                                  className="form-input edit-input"
+                                  value={editForm.year}
+                                  onChange={(e) => setEditForm({ ...editForm, year: e.target.value })}
+                                  placeholder="Year"
+                                />
+                              </div>
+                              <div className="edit-cell">
+                                <span>{student.hasVoted ? 'Yes' : 'No'}</span>
+                              </div>
+                              <div className="action-btns">
+                                <button
+                                  className="action-btn save-btn"
+                                  onClick={() => handleEditStudent(student.id)}
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  className="action-btn cancel-btn"
+                                  onClick={() => {
+                                    setEditingStudent(null);
+                                    setEditForm({ name: '', email: '', year: '', course: '', resetPassword: '' });
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <span>{student.name}</span>
+                              <span>{student.regNo}</span>
+                              <span>{student.year}</span>
+                              <span className={student.hasVoted ? 'voted-yes' : 'voted-no'}>
+                                {student.hasVoted ? '✓ Voted' : '✗ Not Voted'}
+                              </span>
+                              <div className="action-btns">
+                                <button
+                                  className="action-btn edit-btn"
+                                  title="Edit Student"
+                                  onClick={() => {
+                                    setEditingStudent(student.id);
+                                    setEditForm({
+                                      name: student.name,
+                                      email: student.email || '',
+                                      year: student.year || '',
+                                      course: student.course || '',
+                                      resetPassword: ''
+                                    });
+                                  }}
+                                >
+                                  Edit
+                                </button>
+
+                                <button
+                                  className="action-btn reset-btn"
+                                  title="Reset Password"
+                                  onClick={() => setShowResetConfirm(student.id)}
+                                >
+                                  Reset
+                                </button>
+
+                                <button
+                                  className="action-btn delete-btn"
+                                  title="Delete Student"
+                                  onClick={() => setShowDeleteConfirm(student.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ))
+                    )}
                   </div>
 
-                  <div className="pagination">
-                    <button
-                      className="pagination-btn"
-                      onClick={() => setCurrentPage(prev => prev - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      ← Prev
-                    </button>
+                  {totalPages > 0 && (
+                    <div className="pagination">
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(prev => prev - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        ← Prev
+                      </button>
 
-                    <span className="pagination-info">
-                      Page {currentPage} of {totalPages}
-                    </span>
+                      <span className="pagination-info">
+                        Page {currentPage} of {totalPages}
+                      </span>
 
-                    <button
-                      className="pagination-btn"
-                      onClick={() => setCurrentPage(prev => prev + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next →
-                    </button>
-                  </div>
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage(prev => prev + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next →
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </div>

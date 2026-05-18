@@ -1544,3 +1544,387 @@ select.form-input {
   border-color: #dc3545 !important;
   box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
 }
+
+
+.page-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.page-top h2 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.back-btn {
+  order: 1;
+  margin-bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #2e7d32;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
+
+.page-top h2 {
+  order: 2;
+}
+
+/* Table styles - consistent grid layout */
+.students-table-header,
+.students-table-row {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr 1.5fr;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 15px;
+}
+
+.students-table-header {
+  background-color: #2e7d32;
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-radius: 12px 12px 0 0;
+}
+
+.students-table-row {
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.85rem;
+}
+
+.students-table-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.students-table-row:last-child {
+  border-bottom: none;
+}
+
+/* Empty state */
+.empty-text {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+  font-size: 0.95rem;
+}
+
+/* Voted status colors */
+.voted-yes {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.voted-no {
+  color: #e53935;
+  font-weight: 700;
+}
+
+/* Action buttons */
+.action-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.edit-btn:hover {
+  background-color: #c8e6c9;
+}
+
+.reset-btn {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.reset-btn:hover {
+  background-color: #ffe0b2;
+}
+
+.delete-btn {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.delete-btn:hover {
+  background-color: #ffcdd2;
+}
+
+.save-btn {
+  background-color: #2e7d32;
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #1b5e20;
+}
+
+.cancel-btn {
+  background-color: #eeeeee;
+  color: #555;
+}
+
+.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Edit input styles */
+.edit-cell {
+  display: flex;
+  align-items: center;
+}
+
+.edit-input {
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  background-color: #fff;
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
+}
+
+/* Filter tabs */
+.filter-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 8px 20px;
+  border-radius: 30px;
+  border: 2px solid #c8e6c9;
+  background-color: white;
+  color: #2e7d32;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-tab.active {
+  background-color: #2e7d32;
+  color: white;
+  border-color: #2e7d32;
+}
+
+.filter-tab:hover:not(.active) {
+  background-color: #e8f5e9;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.pagination-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 2px solid #2e7d32;
+  background-color: white;
+  color: #2e7d32;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #e8f5e9;
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Search input */
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: none;
+  background-color: #f5f5f5;
+  font-size: 0.95rem;
+  color: #333;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  background-color: #e8f5e9;
+  box-shadow: 0 0 0 2px #2e7d32;
+}
+
+/* Admin card and section */
+.admin-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.admin-section {
+  margin-bottom: 20px;
+}
+
+/* Alert messages */
+.alert {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.alert-error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.alert-success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+/* Loading state */
+.loading-text {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+  font-size: 0.95rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .page-top {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .page-top h2 {
+    order: 2;
+  }
+  
+  .back-btn {
+    order: 1;
+  }
+
+  .students-table-header,
+  .students-table-row {
+    grid-template-columns: 1.5fr 1.5fr 0.8fr 0.8fr 1.2fr;
+    gap: 4px;
+    padding: 8px 10px;
+    font-size: 0.7rem;
+  }
+
+  .action-btn {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+
+  .action-btns {
+    gap: 4px;
+  }
+
+  .filter-tab {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+  }
+
+  .pagination {
+    gap: 10px;
+  }
+
+  .pagination-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .pagination-info {
+    font-size: 0.8rem;
+  }
+
+  .edit-input {
+    padding: 4px 6px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .students-table-header,
+  .students-table-row {
+    grid-template-columns: 1.2fr 1.2fr 0.6fr 0.6fr 1fr;
+    gap: 4px;
+    padding: 6px 8px;
+    font-size: 0.65rem;
+  }
+
+  .action-btn {
+    padding: 3px 6px;
+    font-size: 0.6rem;
+  }
+
+  .filter-tabs {
+    gap: 6px;
+  }
+
+  .filter-tab {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+
+  .pagination-btn {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+}
