@@ -21,6 +21,7 @@ import AuditLogs from './pages/admin/AuditLogs';
 import SessionControl from './pages/admin/SessionControl';
 import Settings from './pages/admin/Settings';
 import CreateElection from './pages/admin/CreateElection';
+import CreateCandidate from './pages/admin/CreateCandidate';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/admin/elections" element={<Elections />} />
         <Route path="/admin/elections/create" element={<CreateElection />} />
+        <Route path="/admin/candidates/create" element={<CreateCandidate />} />
         <Route path="/admin/candidates" element={<Candidates />} />
         <Route path="/admin/candidates/list" element={<CandidatesList />} />
         <Route path="/change-password" element={<ChangePassword />} /> 
