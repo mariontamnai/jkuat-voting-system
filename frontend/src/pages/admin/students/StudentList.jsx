@@ -167,7 +167,6 @@ const StudentList = () => {
         <div className="screen-container">
           <div className="card admin-container">
 
-            {/* Header with only Back button and title - NO Add button */}
             <div className="page-top">
               <button
                 className="back-btn"
@@ -299,7 +298,6 @@ const StudentList = () => {
                               </div>
                             </>
                           ) : showDeleteConfirm === student.id ? (
-                            // Delete Confirmation Mode - Full width row
                             <>
                               <div className="edit-cell">
                                 <span>{student.name}</span>
@@ -331,7 +329,6 @@ const StudentList = () => {
                               </div>
                             </>
                           ) : showResetConfirm === student.id ? (
-                            // Reset Password Confirmation Mode
                             <>
                               <div className="edit-cell">
                                 <span>{student.name}</span>
@@ -363,7 +360,6 @@ const StudentList = () => {
                               </div>
                             </>
                           ) : (
-                            // Normal View Mode
                             <>
                               <span>{student.name}</span>
                               <span>{student.regNo}</span>

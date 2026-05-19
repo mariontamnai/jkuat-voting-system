@@ -67,7 +67,6 @@ export const getResults = async () => {
   const token = sessionStorage.getItem('token');
   let electionId = sessionStorage.getItem('electionId');
 
-  // if no electionId, fetch from elections list
   if (!electionId) {
     try {
       const electionsRes = await fetch(`${config.API_URL}/api/admin/elections`);
@@ -125,7 +124,6 @@ candidatesByPosition: (() => {
       percentage: 0
     });
   });
-  // calculate percentage per position
   Object.keys(grouped).forEach(position => {
     const positionTotal = grouped[position].reduce((sum, c) => sum + c.votes, 0);
     grouped[position] = grouped[position].map(c => ({

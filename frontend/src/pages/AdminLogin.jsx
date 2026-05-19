@@ -12,14 +12,12 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // OTP step
+  
   const [otpStep, setOtpStep] = useState(false);
   const [otp, setOtp] = useState('');
   const [pendingAdminId, setPendingAdminId] = useState('');
 
-  // ==============================
-  // STEP 1 — Password login
-  // ==============================
+  
   const handleLogin = async () => {
     if (!adminId || !password) {
       setError('Please fill in all fields');
@@ -41,9 +39,7 @@ const AdminLogin = () => {
     setLoading(false);
   };
 
-  // ==============================
-  // STEP 2 — OTP verification
-  // ==============================
+  
   const handleVerifyOtp = async () => {
     if (!otp || otp.length !== 6) {
       setError('Please enter the 6-digit OTP');
@@ -76,7 +72,6 @@ const AdminLogin = () => {
         <div className="screen-container">
           <div className="card">
 
-            {/* ====== STEP 1: PASSWORD LOGIN ====== */}
             {!otpStep && (
               <>
                 <h2>Admin Login</h2>
@@ -143,7 +138,6 @@ const AdminLogin = () => {
               </>
             )}
 
-            {/* ====== STEP 2: OTP VERIFICATION ====== */}
             {otpStep && (
               <>
                 <h2>Enter OTP</h2>

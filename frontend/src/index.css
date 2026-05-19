@@ -1087,7 +1087,6 @@ body {
 }
 
 
-/* ─── Action Buttons ─────────────────────────────── */
 .action-btns {
   display: flex;
   gap: 6px;
@@ -1224,7 +1223,6 @@ body {
   box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
 }
 
-/* ─── Form Extras ─────────────────────────────────── */
 select.form-input {
   cursor: pointer;
   appearance: none;
@@ -1360,9 +1358,7 @@ select.form-input {
   box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
 }
 
-/* ================================================ */
-/* CHANGE PASSWORD PAGE STYLES                      */
-/* ================================================ */
+
 .password-change-card {
   padding: 40px 32px;
   border-radius: 24px;
@@ -1467,9 +1463,7 @@ select.form-input {
   text-decoration: underline;
 }
 
-/* ================================================ */
-/* CANDIDATES LIST PAGE STYLES                      */
-/* ================================================ */
+
 .candidates-list-card {
   padding: 30px;
   border-radius: 24px;
@@ -1602,7 +1596,6 @@ select.form-input {
   transition: all 0.2s ease;
 }
 
-/* Edit Card */
 .candidate-edit-card {
   display: flex;
   flex-direction: column;
@@ -1626,7 +1619,6 @@ select.form-input {
   box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
 }
 
-/* Delete Confirmation Card */
 .delete-confirm-card {
   display: flex;
   align-items: center;
@@ -1648,9 +1640,7 @@ select.form-input {
   font-weight: 700;
 }
 
-/* ================================================ */
-/* PAGE TOP HEADER (reused across pages)            */
-/* ================================================ */
+
 .page-top {
   display: flex;
   justify-content: space-between;
@@ -1675,9 +1665,7 @@ select.form-input {
   order: 2;
 }
 
-/* ================================================ */
-/* MOBILE RESPONSIVE                                */
-/* ================================================ */
+
 @media (max-width: 768px) {
   .students-table-row {
     grid-template-columns: 1.5fr 1.5fr 0.8fr 0.8fr 1.2fr;

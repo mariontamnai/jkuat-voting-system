@@ -16,12 +16,10 @@ const ForgotPassword = () => {
   const [regNumberError, setRegNumberError] = useState(false);
 
   const handleSubmit = async () => {
-    // Reset errors
     setError('');
     setEmailError(false);
     setRegNumberError(false);
 
-    // Validation
     let hasError = false;
     
     if (!regNumber) {

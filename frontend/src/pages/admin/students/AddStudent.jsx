@@ -47,7 +47,6 @@ if (!admin || admin.role !== 'mainAdmin') {
   });
 
 
-  // ✅ Preload models on mount so they're ready when camera opens
   useEffect(() => {
     if (!admin) {
       navigate('/admin-login');
@@ -67,7 +66,7 @@ if (!admin || admin.role !== 'mainAdmin') {
   };
 
   const loadModels = async () => {
-    if (modelsLoadedRef.current) return; // already loaded, skip
+    if (modelsLoadedRef.current) return; 
 
     const MODEL_URL = '/models';
 
@@ -83,7 +82,6 @@ if (!admin || admin.role !== 'mainAdmin') {
 
   const openCamera = async () => {
     try {
-      // ✅ Models already loading/loaded from mount — just wait if still in progress
       if (!modelsLoadedRef.current) {
         showMessage('Loading face detection models...', 'info');
         await loadModels();
@@ -158,7 +156,6 @@ if (!admin || admin.role !== 'mainAdmin') {
     setCapturing(true);
 
     try {
-      // ✅ Removed artificial 500ms delay — no reason to wait
 
       const detection = await faceapi
         .detectSingleFace(videoRef.current, detectorOptions)

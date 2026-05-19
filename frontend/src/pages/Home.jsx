@@ -18,7 +18,6 @@ const Home = () => {
       const response = await fetch(`${config.API_URL}/api/admin/elections`);
       const data = await response.json();
       if (Array.isArray(data) && data.length > 0) {
-        // find active or completed election
         const active = data.find(e => e.status === 'active');
         const completed = data.find(e => e.status === 'completed');
         if (active) {

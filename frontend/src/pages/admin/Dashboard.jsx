@@ -119,7 +119,6 @@ const Dashboard = () => {
     { label: 'Create Admin Account', path: '/admin/create-admin', enabled: true, mainAdminOnly: true },
   ];
 
-  // Filter cards based on role
   const visibleCards = navCards.filter(card => !card.mainAdminOnly || isMainAdmin);
 
   return (

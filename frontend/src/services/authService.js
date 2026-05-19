@@ -34,9 +34,7 @@ export const loginStudent = async (regNo, password) => {
   return { success: false, message: data.message || 'Invalid credentials' }
 }
 
-// ==============================
-// 👨‍💼 ADMIN LOGIN — STEP 1 (password check → triggers OTP)
-// ==============================
+
 export const loginAdmin = async (adminId, password) => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -63,9 +61,7 @@ export const loginAdmin = async (adminId, password) => {
   return { success: false, message: data.message || 'Invalid credentials' }
 }
 
-// ==============================
-// 👨‍💼 ADMIN LOGIN — STEP 2 (verify OTP → get token)
-// ==============================
+
 export const verifyAdminOtp = async (adminId, otp) => {
   const response = await fetch(`${config.API_URL}/api/auth/admin/verify-otp`, {
     method: 'POST',

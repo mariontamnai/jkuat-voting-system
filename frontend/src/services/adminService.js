@@ -96,7 +96,6 @@ export const addStudent = async (studentData) => {
 
   const token = sessionStorage.getItem('token');
   
-  // Create AbortController for timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
 

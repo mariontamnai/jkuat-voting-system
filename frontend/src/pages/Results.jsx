@@ -47,7 +47,6 @@ const Results = () => {
   if (result.success) {
     setResults(result.results);
     setLastUpdated(new Date());
-    // check election status from backend
     if (result.electionStatus === 'completed') {
       setSessionEnded(true);
       sessionStorage.setItem('sessionStatus', 'ended');

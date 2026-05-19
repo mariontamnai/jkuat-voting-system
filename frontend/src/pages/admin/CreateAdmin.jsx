@@ -20,7 +20,6 @@ const CreateAdmin = () => {
   const admin = JSON.parse(sessionStorage.getItem('admin'));
   const token = sessionStorage.getItem('token');
 
-  // Redirect if not mainAdmin
   if (!admin || admin.role !== 'mainAdmin') {
     navigate('/admin/dashboard');
     return null;
