@@ -16,11 +16,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-  "start": "react-app-rewired start",
-  "build": "DISABLE_ESLINT_PLUGIN=true react-app-rewired build",
-  "test": "react-app-rewired test",
-  "eject": "react-scripts eject"
-},
+    "start": "react-app-rewired start",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -43,6 +43,11 @@
     "fs": false
   },
   "devDependencies": {
-    "react-app-rewired": "^2.2.1"
+    "@tailwindcss/postcss": "^4.3.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.14",
+    "react-app-rewired": "^2.2.1",
+    "tailwindcss": "^3.4.19"
   }
 }

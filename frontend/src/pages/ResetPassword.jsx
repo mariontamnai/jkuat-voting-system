@@ -18,29 +18,23 @@ const ResetPassword = () => {
       setError('Please fill in all fields');
       return;
     }
-
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
     }
-
     setLoading(true);
     setError('');
-
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/reset-password/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       });
-
       const data = await response.json();
-
       if (response.ok) {
         setSuccess(true);
       } else {
@@ -49,7 +43,6 @@ const ResetPassword = () => {
     } catch (err) {
       setError('Failed to connect. Please try again.');
     }
-
     setLoading(false);
   };
 
@@ -58,15 +51,12 @@ const ResetPassword = () => {
       <div className="bg-animation" />
       <div className="container">
         <Header />
-
         <div className="screen-container">
           <div className="card">
             {!success ? (
               <>
                 <h2>Reset Password</h2>
-                <p className="helper-text">
-                  Enter your new password below.
-                </p>
+                <p className="helper-text">Enter your new password below.</p>
 
                 {error && <div className="alert alert-error">{error}</div>}
 
@@ -131,7 +121,7 @@ const ResetPassword = () => {
                   </p>
                 </div>
 
-                <div className="button-group" style={{ marginTop: '20px' }}>
+                <div className="button-group mt-5">
                   <button
                     className="btn btn-primary"
                     onClick={() => navigate('/student-login')}

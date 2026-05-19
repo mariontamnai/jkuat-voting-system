@@ -21,40 +21,33 @@ const ForgotPassword = () => {
     setRegNumberError(false);
 
     let hasError = false;
-    
     if (!regNumber) {
       setRegNumberError(true);
       setError('Please enter your registration number');
       hasError = true;
     }
-    
     if (!email) {
       setEmailError(true);
       setError('Please enter your email address');
       hasError = true;
       return;
     }
-
     if (email && !emailRegex.test(email)) {
       setError('Please enter a valid email address (e.g. name@example.com)');
       setEmailError(true);
       return;
     }
-
     if (hasError) return;
 
     setLoading(true);
     setError('');
-
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ regNumber, email })
       });
-
       const data = await response.json();
-
       if (response.ok) {
         setSuccess(true);
       } else {
@@ -63,7 +56,6 @@ const ForgotPassword = () => {
     } catch (err) {
       setError('Failed to connect. Please try again.');
     }
-
     setLoading(false);
   };
 
@@ -72,12 +64,10 @@ const ForgotPassword = () => {
       <div className="bg-animation" />
       <div className="container">
         <Header />
-
         <div className="screen-container">
           <div className="card forgot-password-card">
             {!success ? (
               <>
-                {/* Icon */}
                 <div className="forgot-icon">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -104,10 +94,7 @@ const ForgotPassword = () => {
                     className={`form-input ${regNumberError ? 'input-error' : ''}`}
                     placeholder="e.g., SCT111-0111/1900"
                     value={regNumber}
-                    onChange={(e) => {
-                      setRegNumber(e.target.value);
-                      setRegNumberError(false);
-                    }}
+                    onChange={(e) => { setRegNumber(e.target.value); setRegNumberError(false); }}
                   />
                   {regNumberError && (
                     <p className="input-error-hint">Registration number is required</p>
@@ -121,10 +108,7 @@ const ForgotPassword = () => {
                     className={`form-input ${emailError ? 'input-error' : ''}`}
                     placeholder="Enter your email address"
                     value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      setEmailError(false);
-                    }}
+                    onChange={(e) => { setEmail(e.target.value); setEmailError(false); }}
                   />
                   {emailError && (
                     <p className="input-error-hint">Please enter a valid email address</p>
@@ -139,7 +123,9 @@ const ForgotPassword = () => {
                   >
                     {loading ? (
                       <>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite', marginRight: '8px' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" strokeWidth="2"
+                             className="animate-spin mr-2">
                           <circle cx="12" cy="12" r="10" />
                           <path d="M12 6v6l4 2" />
                         </svg>
@@ -193,8 +179,6 @@ const ForgotPassword = () => {
         </div>
       </div>
       <Footer />
-
-      
     </div>
   );
 };

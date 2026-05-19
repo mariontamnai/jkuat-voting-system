@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const AuditLogs = () => {
   const navigate = useNavigate();
-  const admin = JSON.parse(sessionStorage.getItem('admin'));
-if (!admin || admin.role !== 'mainAdmin') {
-  navigate('/admin/dashboard');
-}
+  const admin = JSON.parse(sessionStorage.getItem("admin"));
+  if (!admin || admin.role !== "mainAdmin") navigate("/admin/dashboard");
+
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [filter, setFilter] = useState('ALL');
-  const [search, setSearch] = useState('');
+  const [error, setError] = useState("");
+  const [filter, setFilter] = useState("ALL");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token');
+    const token = sessionStorage.getItem("token");
     if (!token) {
-      navigate('/admin-login');
+      navigate("/admin-login");
       return;
     }
     fetchLogs();
@@ -26,298 +25,396 @@ if (!admin || admin.role !== 'mainAdmin') {
 
   const fetchLogs = async () => {
     setLoading(true);
-    setError('');
-    
+    setError("");
     try {
-      const token = sessionStorage.getItem('token');
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/audit-logs`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const token = sessionStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/admin/audit-logs`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch logs');
-      }
-
+      );
+      if (!response.ok) throw new Error("Failed to fetch logs");
       const data = await response.json();
       setLogs(data);
     } catch (err) {
-      setError('Failed to load audit logs');
-      console.error('Fetch error:', err);
+      setError("Failed to load audit logs");
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'SUCCESS': return '#2e7d32';
-      case 'FAILURE': return '#c62828';
-      case 'INFO': return '#1565c0';
-      default: return '#888';
-    }
+  const statusConfig = {
+    SUCCESS: {
+      pill: "bg-green-100 text-green-700 border border-green-200",
+      border: "border-l-green-500",
+      stat: "bg-green-50 border border-green-100 text-green-700",
+    },
+    FAILURE: {
+      pill: "bg-red-100 text-red-700 border border-red-200",
+      border: "border-l-red-500",
+      stat: "bg-red-50 border border-red-100 text-red-700",
+    },
+    INFO: {
+      pill: "bg-blue-100 text-blue-700 border border-blue-200",
+      border: "border-l-blue-400",
+      stat: "bg-blue-50 border border-blue-100 text-blue-700",
+    },
   };
 
-  const getActionIcon = (action) => {
-    if (action.includes('LOGIN')) return '🔐';
-    if (action.includes('REGISTER') || action.includes('CREATE')) return '➕';
-    if (action.includes('DELETE')) return '🗑️';
-    if (action.includes('UPDATE')) return '✏️';
-    if (action.includes('VOTE')) return '🗳️';
-    if (action.includes('ELECTION')) return '📋';
-    if (action.includes('FACE') || action.includes('BIOMETRIC')) return '👤';
-    if (action.includes('PASSWORD')) return '🔑';
-    if (action.includes('RESET')) return '⚠️';
-    return '📝';
+  const getActionIcon = (action = "") => {
+    if (action.includes("LOGIN")) return "🔐";
+    if (action.includes("REGISTER") || action.includes("CREATE")) return "➕";
+    if (action.includes("DELETE")) return "🗑️";
+    if (action.includes("UPDATE")) return "✏️";
+    if (action.includes("VOTE")) return "🗳️";
+    if (action.includes("ELECTION")) return "📋";
+    if (action.includes("FACE") || action.includes("BIOMETRIC")) return "👤";
+    if (action.includes("PASSWORD")) return "🔑";
+    if (action.includes("RESET")) return "⚠️";
+    return "📝";
   };
 
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString('en-KE', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+  const formatDate = (timestamp) =>
+    new Date(timestamp).toLocaleString("en-KE", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
-  };
 
   const filteredLogs = logs.filter((log) => {
-    const matchesFilter = filter === 'ALL' || log.status === filter;
+    const matchesFilter = filter === "ALL" || log.status === filter;
     const matchesSearch =
-      search === '' ||
+      search === "" ||
       log.action?.toLowerCase().includes(search.toLowerCase()) ||
-      (log.ipAddress && log.ipAddress.includes(search)) ||
-      (log.userModel && log.userModel.toLowerCase().includes(search.toLowerCase()));
+      log.ipAddress?.includes(search) ||
+      log.userModel?.toLowerCase().includes(search.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
   return (
-    <div className="voting-system">
-      <div className="bg-animation" />
-      <div className="container">
-        <Header />
+    <div
+      className="min-h-screen flex flex-col bg-[#e8f0e8]"
+      style={{
+        backgroundImage: `
+          radial-gradient(ellipse 80% 60% at 50% -10%, #c5dbc5 0%, transparent 70%),
+          radial-gradient(ellipse 50% 40% at 90% 80%, #d0e8d0 0%, transparent 60%)
+        `,
+      }}
+    >
+      <Header />
 
-        <div className="screen-container">
-          <div className="card" style={{ maxWidth: '900px', width: '100%' }}>
-
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+      <main className="flex-1 flex items-start justify-center px-4 pb-10">
+        <div className="bg-white rounded-2xl w-full max-w-4xl shadow-xl border border-green-100 overflow-hidden">
+          {/* ── Top banner ── */}
+          <div className="bg-gradient-to-br from-[#1a3a1a] to-[#2d6a2d] px-8 pt-8 pb-7">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 style={{ margin: 0 }}>Audit Logs</h2>
-                <p style={{ margin: '4px 0 0', color: '#888', fontSize: '14px' }}>
-                  System activity history
+                <span
+                  className="inline-flex items-center gap-1.5 bg-white/10 text-white/70
+                                 border border-white/20 text-[0.6rem] font-black
+                                 tracking-widest uppercase px-2.5 py-1 rounded-full mb-2"
+                >
+                  🛡️ Admin · Main Admin Only
+                </span>
+                <h2 className="text-white text-2xl font-black tracking-tight">
+                  Audit Logs
+                </h2>
+                <p className="text-white/60 text-xs font-light mt-1">
+                  System activity history · {logs.length} total events
                 </p>
               </div>
               <button
-                className="btn btn-outline"
-                onClick={() => navigate('/admin/dashboard')}
-                style={{ fontSize: '14px', padding: '8px 16px' }}
+                onClick={() => navigate("/admin/dashboard")}
+                className="shrink-0 mt-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20
+                           text-white text-xs font-bold tracking-widest uppercase
+                           hover:bg-white/20 transition-colors cursor-pointer"
               >
-                ← BACK TO DASHBOARD
+                ← Dashboard
               </button>
             </div>
+          </div>
 
-            {/* Search and Filter */}
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Search by action, IP, or user type..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ flex: 1, minWidth: '200px' }}
-              />
+          <div className="px-6 py-7 md:px-8">
+            {/* ── Stats row ── */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+              {[
+                { label: "Success", key: "SUCCESS", icon: "✅" },
+                { label: "Failure", key: "FAILURE", icon: "❌" },
+                { label: "Info", key: "INFO", icon: "ℹ️" },
+                { label: "Total", key: null, icon: "📋" },
+              ].map(({ label, key, icon }) => {
+                const count = key
+                  ? logs.filter((l) => l.status === key).length
+                  : logs.length;
+                const cfg = key ? statusConfig[key] : null;
+                return (
+                  <button
+                    key={label}
+                    onClick={() =>
+                      key && setFilter(filter === key ? "ALL" : key)
+                    }
+                    className={`rounded-xl px-3 py-3.5 text-center border transition-all duration-150
+                                ${cfg ? cfg.stat : "bg-gray-50 border-gray-100 text-gray-700"}
+                                ${filter === key ? "ring-2 ring-offset-1 ring-[#2d6a2d]" : ""}
+                                ${key ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
+                  >
+                    <div className="text-lg mb-0.5">{icon}</div>
+                    <div className="text-xl font-black leading-none">
+                      {count}
+                    </div>
+                    <div className="text-[0.6rem] font-bold tracking-widest uppercase mt-1 opacity-70">
+                      {label}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* ── Search & filter bar ── */}
+            <div className="flex flex-wrap gap-3 mb-6">
+              <div className="relative flex-1 min-w-[200px]">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-sm">
+                  🔍
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search action, IP, or user type..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={{ backgroundColor: "white", color: "#1a3a1a" }}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200
+                             text-sm outline-none placeholder-gray-300
+                             focus:border-[#2d6a2d] focus:ring-2 focus:ring-[#2d6a2d]/15
+                             transition-all duration-150"
+                />
+              </div>
+
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: '12px',
-                  border: '2px solid #e0e0e0',
-                  fontSize: '14px',
-                  background: '#fff',
-                  cursor: 'pointer',
-                }}
+                style={{ backgroundColor: "white", color: "#1a3a1a" }}
+                className="py-2.5 px-4 rounded-lg border border-gray-200 text-sm
+                           outline-none focus:border-[#2d6a2d] focus:ring-2 focus:ring-[#2d6a2d]/15
+                           cursor-pointer transition-all duration-150"
               >
                 <option value="ALL">All Status</option>
                 <option value="SUCCESS">Success</option>
                 <option value="FAILURE">Failure</option>
                 <option value="INFO">Info</option>
               </select>
+
               <button
-                className="btn btn-primary"
                 onClick={fetchLogs}
                 disabled={loading}
-                style={{ 
-                  fontSize: '14px', 
-                  padding: '8px 16px', 
-                  whiteSpace: 'nowrap',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  opacity: loading ? 0.6 : 1,
-                  cursor: loading ? 'not-allowed' : 'pointer'
-                }}
+                className="px-4 py-2.5 rounded-lg bg-[#1a3a1a] hover:bg-[#152e15]
+                           text-white text-xs font-black tracking-widest uppercase
+                           cursor-pointer transition-colors duration-150
+                           flex items-center gap-2
+                           disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 6v6l4 2" />
+                    <svg
+                      className="animate-spin h-3.5 w-3.5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      />
                     </svg>
                     Loading...
                   </>
                 ) : (
-                  <>
-                    🔄 Refresh
-                  </>
+                  "🔄 Refresh"
                 )}
               </button>
             </div>
 
-            {/* Stats Row */}
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-              {['SUCCESS', 'FAILURE', 'INFO'].map((s) => (
-                <div
-                  key={s}
-                  style={{
-                    flex: 1,
-                    minWidth: '80px',
-                    padding: '12px',
-                    borderRadius: '12px',
-                    background: s === 'SUCCESS' ? '#e8f5e9' : s === 'FAILURE' ? '#ffebee' : '#e3f2fd',
-                    textAlign: 'center',
-                  }}
-                >
-                  <div style={{ fontSize: '20px', fontWeight: '700', color: getStatusColor(s) }}>
-                    {logs.filter((l) => l.status === s).length}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>{s}</div>
-                </div>
-              ))}
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: '80px',
-                  padding: '12px',
-                  borderRadius: '12px',
-                  background: '#f5f5f5',
-                  textAlign: 'center',
-                }}
-              >
-                <div style={{ fontSize: '20px', fontWeight: '700', color: '#333' }}>
-                  {logs.length}
-                </div>
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>TOTAL</div>
-              </div>
-            </div>
+            {/* Results count */}
+            {!loading && !error && (
+              <p className="text-xs text-gray-400 mb-4">
+                Showing{" "}
+                <span className="font-bold text-[#1a3a1a]">
+                  {filteredLogs.length}
+                </span>{" "}
+                of{" "}
+                <span className="font-bold text-[#1a3a1a]">{logs.length}</span>{" "}
+                events
+                {filter !== "ALL" && (
+                  <button
+                    onClick={() => {
+                      setFilter("ALL");
+                      setSearch("");
+                    }}
+                    className="ml-2 text-[#2d6a2d] font-bold hover:underline cursor-pointer"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </p>
+            )}
 
-            {/* Content */}
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-                Loading audit logs...
+            {/* ── Loading ── */}
+            {loading && (
+              <div className="flex flex-col items-center justify-center py-16 gap-3">
+                <svg
+                  className="animate-spin h-8 w-8 text-[#2d6a2d]"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z"
+                  />
+                </svg>
+                <p className="text-sm text-gray-400 font-medium">
+                  Loading audit logs...
+                </p>
               </div>
-            ) : error ? (
-              <div className="alert alert-error" style={{ textAlign: 'center' }}>
-                {error}
+            )}
+
+            {/* ── Error ── */}
+            {!loading && error && (
+              <div
+                className="flex items-center justify-between gap-4 bg-red-50
+                              border border-red-200 rounded-xl px-4 py-3.5 mb-4"
+              >
+                <div className="flex items-center gap-2 text-red-700 text-sm font-semibold">
+                  <span>⚠️</span>
+                  <span>{error}</span>
+                </div>
                 <button
                   onClick={fetchLogs}
-                  style={{
-                    marginLeft: '12px',
-                    padding: '4px 12px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    background: '#c62828',
-                    color: 'white',
-                    cursor: 'pointer'
-                  }}
+                  className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700
+                             text-white text-xs font-bold cursor-pointer
+                             transition-colors duration-150"
                 >
                   Try Again
                 </button>
               </div>
-            ) : filteredLogs.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-                No logs found matching your criteria
+            )}
+
+            {/* ── Empty state ── */}
+            {!loading && !error && filteredLogs.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-16 gap-2">
+                <span className="text-4xl">🔍</span>
+                <p className="text-sm font-bold text-gray-400">
+                  No logs match your criteria
+                </p>
+                <button
+                  onClick={() => {
+                    setFilter("ALL");
+                    setSearch("");
+                  }}
+                  className="mt-1 text-xs text-[#2d6a2d] font-bold hover:underline cursor-pointer"
+                >
+                  Clear filters
+                </button>
               </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {filteredLogs.map((log, index) => (
-                  <div
-                    key={log._id || index}
-                    style={{
-                      padding: '14px 16px',
-                      borderRadius: '12px',
-                      background: '#f9f9f9',
-                      border: '1px solid #eee',
-                      borderLeft: `4px solid ${getStatusColor(log.status)}`,
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                      {/* Left: action */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ fontSize: '20px' }}>{getActionIcon(log.action)}</span>
-                        <div>
-                          <div style={{ fontWeight: '700', fontSize: '14px', color: '#222' }}>
-                            {log.action?.replace(/_/g, ' ') || 'Unknown Action'}
+            )}
+
+            {/* ── Log entries ── */}
+            {!loading && !error && filteredLogs.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {filteredLogs.map((log, index) => {
+                  const cfg = statusConfig[log.status] || {
+                    pill: "bg-gray-100 text-gray-600 border border-gray-200",
+                    border: "border-l-gray-300",
+                  };
+                  return (
+                    <div
+                      key={log._id || index}
+                      className={`rounded-xl bg-gray-50 border border-gray-100
+                                  border-l-4 ${cfg.border}
+                                  px-4 py-3.5 transition-all duration-150
+                                  hover:bg-white hover:shadow-sm`}
+                    >
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        {/* Left: icon + action */}
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="w-8 h-8 rounded-lg bg-white border border-gray-100
+                                          flex items-center justify-center text-base shrink-0 mt-0.5"
+                          >
+                            {getActionIcon(log.action)}
                           </div>
-                          <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>
-                            {log.userModel || 'System'} • IP: {log.ipAddress || 'N/A'}
+                          <div>
+                            <p className="text-sm font-black text-[#1a3a1a] leading-tight">
+                              {log.action?.replace(/_/g, " ") ||
+                                "Unknown Action"}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-2">
+                              <span>{log.userModel || "System"}</span>
+                              <span className="w-1 h-1 rounded-full bg-gray-300" />
+                              <span className="font-mono">
+                                IP: {log.ipAddress || "N/A"}
+                              </span>
+                            </p>
                           </div>
+                        </div>
+
+                        {/* Right: status pill + timestamp */}
+                        <div className="text-right shrink-0">
+                          <span
+                            className={`inline-block px-2.5 py-0.5 rounded-full
+                                           text-[0.6rem] font-black tracking-widest uppercase
+                                           mb-1 ${cfg.pill}`}
+                          >
+                            {log.status}
+                          </span>
+                          <p className="text-[0.65rem] text-gray-400 font-mono">
+                            {formatDate(log.timestamp)}
+                          </p>
                         </div>
                       </div>
 
-                      {/* Right: status + time */}
-                      <div style={{ textAlign: 'right' }}>
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            padding: '3px 10px',
-                            borderRadius: '20px',
-                            fontSize: '11px',
-                            fontWeight: '700',
-                            color: '#fff',
-                            background: getStatusColor(log.status),
-                            marginBottom: '4px',
-                          }}
+                      {/* Details block */}
+                      {log.details && Object.keys(log.details).length > 0 && (
+                        <div
+                          className="mt-3 bg-white border border-gray-100 rounded-lg
+                                        px-3 py-2.5 text-xs text-gray-500 font-mono
+                                        overflow-x-auto whitespace-pre-wrap"
                         >
-                          {log.status}
-                        </span>
-                        <div style={{ fontSize: '11px', color: '#aaa' }}>
-                          {formatDate(log.timestamp)}
+                          {JSON.stringify(log.details, null, 2)}
                         </div>
-                      </div>
+                      )}
                     </div>
-
-                    {/* Details if present */}
-                    {log.details && Object.keys(log.details).length > 0 && (
-                      <div
-                        style={{
-                          marginTop: '8px',
-                          padding: '8px 10px',
-                          background: '#f0f0f0',
-                          borderRadius: '8px',
-                          fontSize: '12px',
-                          color: '#555',
-                          fontFamily: 'monospace',
-                        }}
-                      >
-                        {JSON.stringify(log.details, null, 2)}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
-      </div>
-      <Footer />
+      </main>
 
-      
+      <Footer />
     </div>
   );
 };
