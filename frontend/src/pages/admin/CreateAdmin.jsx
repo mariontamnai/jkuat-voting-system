@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import config from '../../config';
 
 const CreateAdmin = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const CreateAdmin = () => {
     setMessage('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/create-admin`, {
+        const response = await fetch(`${config.API_URL}/api/admin/create-admin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
