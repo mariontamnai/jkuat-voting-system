@@ -13,6 +13,7 @@ const Dashboard = () => {
   const [phase, setPhase] = useState(sessionStorage.getItem('adminPhase') || 'idle');
 
   const admin = JSON.parse(sessionStorage.getItem('admin'));
+  const isMainAdmin = admin?.role === 'mainAdmin';
 
   useEffect(() => {
     if (!admin) {
@@ -106,25 +107,19 @@ const Dashboard = () => {
   };
 
   const navCards = [
-  { label: 'Manage Elections', path: '/admin/elections', enabled: true },
+    { label: 'Manage Elections', path: '/admin/elections', enabled: true, mainAdminOnly: false },
+    { label: 'Manage Candidates', path: '/admin/candidates', enabled: true, mainAdminOnly: false },
+    { label: 'Add Student', path: '/admin/students/add', enabled: true, mainAdminOnly: true },
+    { label: 'Student List', path: '/admin/students/list', enabled: true, mainAdminOnly: false },
+    { label: 'Session Control', path: '/admin/session-control', enabled: true, mainAdminOnly: false },
+    { label: 'System Settings', path: '/admin/settings', enabled: true, mainAdminOnly: false },
+    { label: 'View Results', path: '/results', enabled: phase === 'counting' || phase === 'published', mainAdminOnly: false },
+    { label: 'View Winner', path: '/winner', enabled: phase === 'published', mainAdminOnly: false },
+    { label: 'Audit Logs', path: '/admin/audit-logs', enabled: true, mainAdminOnly: false },
+    { label: 'Create Admin Account', path: '/admin/create-admin', enabled: true, mainAdminOnly: true },
+  ];
 
-  { label: 'Manage Candidates', path: '/admin/candidates', enabled: true },
-
-  { label: 'Add Student', path: '/admin/students/add', enabled: true },
-
-  { label: 'Student List', path: '/admin/students/list', enabled: true },
-
-  { label: 'Session Control', path: '/admin/session-control', enabled: true },
-
-  { label: 'System Settings', path: '/admin/settings', enabled: true },
-
-  { label: 'View Results', path: '/results', enabled: phase === 'counting' || phase === 'published' },
-
-  { label: 'View Winner', path: '/winner', enabled: phase === 'published' },
-
-  { label: 'Audit Logs', path: '/admin/audit-logs', enabled: true },
-];
-  
+  const visibleCards = navCards.filter(card => !card.mainAdminOnly || isMainAdmin);
 
   return (
     <div className="voting-system">
@@ -135,6 +130,20 @@ const Dashboard = () => {
           <div className="card">
             <h2>Admin Dashboard</h2>
             <p className="helper-text">Welcome, {admin?.name}</p>
+
+            {/* Role badge */}
+            <div style={{
+              display: 'inline-block',
+              background: isMainAdmin ? '#2e7d32' : '#1565c0',
+              color: 'white',
+              padding: '4px 12px',
+              borderRadius: '20px',
+              fontSize: '0.75rem',
+              fontWeight: '700',
+              marginBottom: '16px'
+            }}>
+              {isMainAdmin ? 'MAIN ADMIN' : 'ELECTION OFFICER'}
+            </div>
 
             {message && (
               <div className={`alert alert-${messageType}`}>{message}</div>
@@ -171,7 +180,7 @@ const Dashboard = () => {
                 <div className="admin-section">
                   <h3 className="admin-section-title">Quick Navigation</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                    {navCards.map((card) => (
+                    {visibleCards.map((card) => (
                       <button
                         key={card.path}
                         className="btn btn-outline"
@@ -179,7 +188,6 @@ const Dashboard = () => {
                         disabled={!card.enabled}
                         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', padding: '20px 10px' }}
                       >
-                        
                         <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{card.label}</span>
                       </button>
                     ))}
@@ -192,15 +200,15 @@ const Dashboard = () => {
                 </div>
 
                 <button
-  className="btn btn-outline"
-  onClick={() => {
-    sessionStorage.clear();
-    navigate('/');
-  }}
->
-  LOGOUT
-</button>
-                
+                  className="btn btn-outline"
+                  onClick={() => {
+                    sessionStorage.clear();
+                    navigate('/');
+                  }}
+                >
+                  LOGOUT
+                </button>
+
               </>
             )}
           </div>

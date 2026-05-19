@@ -34,11 +34,12 @@ export const loginStudent = async (regNo, password) => {
   return { success: false, message: data.message || 'Invalid credentials' }
 }
 
+
 export const loginAdmin = async (adminId, password) => {
   if (config.USE_MOCK) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (adminId === mockAdmin.adminId && password === 'admin123') {
-      return { success: true, user: mockAdmin, token: 'MOCK-ADMIN-TOKEN' }
+      return { success: true, otpSent: true, adminId: 'MOCK-ADMIN-ID' }
     }
     return { success: false, message: 'Invalid credentials' }
   }
@@ -49,19 +50,38 @@ export const loginAdmin = async (adminId, password) => {
     body: JSON.stringify({ regNumber: adminId, password })
   })
   const data = await response.json()
+
+  if (data.otpSent) {
+    return {
+      success: true,
+      otpSent: true,
+      adminId: data.adminId
+    }
+  }
+  return { success: false, message: data.message || 'Invalid credentials' }
+}
+
+
+export const verifyAdminOtp = async (adminId, otp) => {
+  const response = await fetch(`${config.API_URL}/api/auth/admin/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ adminId, otp })
+  })
+  const data = await response.json()
+
   if (data.token) {
     return {
       success: true,
       token: data.token,
       user: {
-        id: data.adminId ,
+        id: data.adminId,
         name: 'Admin User',
-        adminId,
         role: data.role
       }
     }
   }
-  return { success: false, message: data.message || 'Invalid credentials' }
+  return { success: false, message: data.message || 'Invalid OTP' }
 }
 
 export const verifyFace = async (faceDescriptor, studentId) => {

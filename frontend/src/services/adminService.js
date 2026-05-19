@@ -78,7 +78,6 @@ export const getStudents = async () => {
         year: s.year,
         email: s.email,
         hasVoted: s.hasVoted,
-        faceDescriptor: s.faceDescriptor
       }))
     }
   }
@@ -96,41 +95,58 @@ export const addStudent = async (studentData) => {
   }
 
   const token = sessionStorage.getItem('token');
-  const response = await fetch(`${config.API_URL}/api/admin/students`, {
-    method: 'POST',
-    headers: {
-      ...authHeaders(token),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      regNumber: studentData.regNo,
-      fullName: studentData.name,
-      email: studentData.email,
-      year: studentData.year,
-      course: studentData.course,
-      password: studentData.password,
-      faceDescriptor: studentData.faceDescriptor
-    })
-  })
-  const data = await response.json()
-  if (response.ok) {
-  return {
-    success: true,
-    message: data.message,
-    student: {
-      id: Date.now(),
-      name: studentData.name,
-      regNo: studentData.regNo,
-      year: studentData.year,
-      email: studentData.email,
-      course: studentData.course,
-      hasVoted: false,
-      faceDescriptor: studentData.faceDescriptor
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+
+  try {
+    const response = await fetch(`${config.API_URL}/api/admin/students`, {
+      method: 'POST',
+      headers: {
+        ...authHeaders(token),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        regNumber: studentData.regNo,
+        fullName: studentData.name,
+        email: studentData.email,
+        year: studentData.year,
+        course: studentData.course,
+        password: studentData.password,
+        faceDescriptor: studentData.faceDescriptor
+      }),
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    const data = await response.json();
+    
+    if (response.ok) {
+      return {
+        success: true,
+        message: data.message || 'Student added successfully',
+        student: data.student
+      }
     }
+    
+    return { 
+      success: false, 
+      message: data.message || 'Failed to add student' 
+    }
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      return { 
+        success: false, 
+        message: 'Server is taking too long to respond. Please check your connection and try again.' 
+      };
+    }
+    return { 
+      success: false, 
+      message: error.message || 'Network error - could not connect to server' 
+    };
   }
-}
-  return { success: false, message: data.message }
-}
+};
 
 export const updateStudent = async (studentId, studentData) => {
   if (config.USE_MOCK) {
@@ -298,6 +314,7 @@ export const getCandidates = async (electionId) => {
   }
   return { success: false, message: data.message };
 };
+
 export const resetAllData = async () => {
   const token = sessionStorage.getItem('token');
   const response = await fetch(`${config.API_URL}/api/admin/reset`, {
@@ -311,7 +328,7 @@ export const resetAllData = async () => {
   return { success: false, message: data.message };
 };
 
-  export const updateCandidate = async (electionId, candidateId, candidateData) => {
+export const updateCandidate = async (electionId, candidateId, candidateData) => {
   const token = sessionStorage.getItem('token');
   const response = await fetch(`${config.API_URL}/api/admin/elections/${electionId}/candidates/${candidateId}`, {
     method: 'PUT',
@@ -340,4 +357,3 @@ export const deleteCandidate = async (electionId, candidateId) => {
   }
   return { success: false, message: data.message };
 };
-

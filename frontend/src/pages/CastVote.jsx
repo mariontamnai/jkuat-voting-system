@@ -35,10 +35,9 @@ const CastVote = () => {
     setLoading(true);
     const result = await getCandidates();
     if (result.success) {
-      // group candidates by position
       const grouped = {};
       result.candidates.forEach(candidate => {
-        const position = candidate.faculty; // faculty holds position
+        const position = candidate.faculty; 
         if (!grouped[position]) {
           grouped[position] = [];
         }
@@ -68,13 +67,11 @@ const CastVote = () => {
       setVotedPositions(result.votedPositions);
       
       if (result.allPositionsVoted) {
-        // all positions done — go to submitted page
         const updatedUser = { ...user, hasVoted: true };
         sessionStorage.setItem('user', JSON.stringify(updatedUser));
         sessionStorage.setItem('votedFor', JSON.stringify(selectedCandidate));
         navigate('/vote-submitted');
       } else {
-        // move to next position
         setSelectedCandidate(null);
         setCurrentPositionIndex(prev => prev + 1);
       }

@@ -193,19 +193,43 @@ const CandidatesList = () => {
         <Header />
 
         <div className="screen-container">
-          <div className="card">
+          <div className="card candidates-list-card">
 
             {/* Back Button */}
-            <button
-              className="back-btn"
-              onClick={() =>
-                navigate('/admin/candidates')
-              }
-            >
-              ← Back to Candidates
-            </button>
+            <div className="page-top-candidates">
+              <button
+                className="back-btn"
+                onClick={() =>
+                  navigate('/admin/candidates')
+                }
+              >
+                ← Back to Candidates
+              </button>
 
-            <h2>Candidates List</h2>
+              <h2>Candidates List</h2>
+            </div>
+
+            {/* Election Selector */}
+            {elections.length > 0 && (
+              <div className="election-selector">
+                <label className="form-label">SELECT ELECTION</label>
+                <select
+                  className="form-input"
+                  value={selectedElection}
+                  onChange={(e) => {
+                    setSelectedElection(e.target.value);
+                    sessionStorage.setItem('electionId', e.target.value);
+                  }}
+                >
+                  <option value="">Select Election</option>
+                  {elections.map((election) => (
+                    <option key={election.id} value={election.id}>
+                      {election.title} ({election.year})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {message && (
               <div
@@ -272,202 +296,204 @@ const CandidatesList = () => {
                         </div>
 
                         {/* Candidate Cards */}
-                        {positionCandidates.map(
-                          (c) => (
-                            <div key={c.id}>
+                        <div className="candidates-grid-list">
+                          {positionCandidates.map(
+                            (c) => (
+                              <div key={c.id} className="candidate-item-wrapper">
 
-                              {editingCandidate ===
-                              c.id ? (
-
-                                <div className="candidate-edit-card">
-
-                                  <input
-                                    className="form-input"
-                                    value={
-                                      editCandidateForm.name
-                                    }
-                                    onChange={(e) =>
-                                      setEditCandidateForm(
-                                        {
-                                          ...editCandidateForm,
-                                          name:
-                                            e
-                                              .target
-                                              .value
-                                        }
-                                      )
-                                    }
-                                    placeholder="Name"
-                                  />
-
-                                  <input
-                                    className="form-input"
-                                    value={
-                                      editCandidateForm.position
-                                    }
-                                    onChange={(e) =>
-                                      setEditCandidateForm(
-                                        {
-                                          ...editCandidateForm,
-                                          position:
-                                            e
-                                              .target
-                                              .value
-                                        }
-                                      )
-                                    }
-                                    placeholder="Position"
-                                  />
-
-                                  <input
-                                    className="form-input"
-                                    value={
-                                      editCandidateForm.party
-                                    }
-                                    onChange={(e) =>
-                                      setEditCandidateForm(
-                                        {
-                                          ...editCandidateForm,
-                                          party:
-                                            e
-                                              .target
-                                              .value
-                                        }
-                                      )
-                                    }
-                                    placeholder="Party"
-                                  />
-
-                                  <div className="action-btns">
-
-                                    <button
-                                      className="action-btn save-btn"
-                                      onClick={() =>
-                                        handleSaveCandidate(
-                                          c.id
-                                        )
-                                      }
-                                    >
-                                      Save
-                                    </button>
-
-                                    <button
-                                      className="action-btn cancel-btn"
-                                      onClick={() =>
-                                        setEditingCandidate(
-                                          null
-                                        )
-                                      }
-                                    >
-                                      Cancel
-                                    </button>
-
-                                  </div>
-
-                                </div>
-
-                              ) : showDeleteConfirm ===
+                                {editingCandidate ===
                                 c.id ? (
 
-                                <div className="delete-confirm">
+                                  <div className="candidate-edit-card">
 
-                                  <span>
-                                    Delete{' '}
-                                    <strong>
-                                      {c.name}
-                                    </strong>
-                                    ?
-                                  </span>
-
-                                  <div className="action-btns">
-
-                                    <button
-                                      className="action-btn delete-btn"
-                                      onClick={() =>
-                                        handleDeleteCandidate(
-                                          c.id
+                                    <input
+                                      className="form-input"
+                                      value={
+                                        editCandidateForm.name
+                                      }
+                                      onChange={(e) =>
+                                        setEditCandidateForm(
+                                          {
+                                            ...editCandidateForm,
+                                            name:
+                                              e
+                                                .target
+                                                .value
+                                          }
                                         )
                                       }
-                                    >
-                                      Yes, Delete
-                                    </button>
+                                      placeholder="Name"
+                                    />
 
-                                    <button
-                                      className="action-btn cancel-btn"
-                                      onClick={() =>
-                                        setShowDeleteConfirm(
-                                          null
+                                    <input
+                                      className="form-input"
+                                      value={
+                                        editCandidateForm.position
+                                      }
+                                      onChange={(e) =>
+                                        setEditCandidateForm(
+                                          {
+                                            ...editCandidateForm,
+                                            position:
+                                              e
+                                                .target
+                                                .value
+                                          }
                                         )
                                       }
-                                    >
-                                      Cancel
-                                    </button>
+                                      placeholder="Position"
+                                    />
+
+                                    <input
+                                      className="form-input"
+                                      value={
+                                        editCandidateForm.party
+                                      }
+                                      onChange={(e) =>
+                                        setEditCandidateForm(
+                                          {
+                                            ...editCandidateForm,
+                                            party:
+                                              e
+                                                .target
+                                                .value
+                                          }
+                                        )
+                                      }
+                                      placeholder="Party"
+                                    />
+
+                                    <div className="action-btns-candidates">
+
+                                      <button
+                                        className="action-btn save-btn"
+                                        onClick={() =>
+                                          handleSaveCandidate(
+                                            c.id
+                                          )
+                                        }
+                                      >
+                                        Save
+                                      </button>
+
+                                      <button
+                                        className="action-btn cancel-btn"
+                                        onClick={() =>
+                                          setEditingCandidate(
+                                            null
+                                          )
+                                        }
+                                      >
+                                        Cancel
+                                      </button>
+
+                                    </div>
 
                                   </div>
 
-                                </div>
+                                ) : showDeleteConfirm ===
+                                  c.id ? (
 
-                              ) : (
+                                  <div className="delete-confirm-card">
 
-                                <div className="candidate-card">
+                                    <span className="delete-warning">
+                                      Delete <strong>{c.name}</strong>?
+                                    </span>
 
-                                  <div className="candidate-info">
+                                    <div className="action-btns-candidates">
 
-                                    <p className="candidate-name">
-                                      {c.name}
-                                    </p>
+                                      <button
+                                        className="action-btn delete-confirm-btn"
+                                        onClick={() =>
+                                          handleDeleteCandidate(
+                                            c.id
+                                          )
+                                        }
+                                      >
+                                        Confirm
+                                      </button>
 
-                                    
+                                      <button
+                                        className="action-btn cancel-btn"
+                                        onClick={() =>
+                                          setShowDeleteConfirm(
+                                            null
+                                          )
+                                        }
+                                      >
+                                        Cancel
+                                      </button>
 
-                                    {c.party && (
-                                      <p className="candidate-party">
-                                        {c.party}
+                                    </div>
+
+                                  </div>
+
+                                ) : (
+
+                                  <div className="candidate-card-list">
+
+                                    <div className="candidate-avatar-list">
+                                      <span className="candidate-initial">
+                                        {c.name.charAt(0)}
+                                      </span>
+                                    </div>
+
+                                    <div className="candidate-info-list">
+
+                                      <p className="candidate-name-list">
+                                        {c.name}
                                       </p>
-                                    )}
+
+                                      {c.party && (
+                                        <p className="candidate-party-list">
+                                          {c.party}
+                                        </p>
+                                      )}
+
+                                    </div>
+
+                                    <div className="action-btns-candidates">
+
+                                      <button
+                                        className="action-btn edit-btn"
+                                        onClick={() =>
+                                          handleEditCandidate(
+                                            c
+                                          )
+                                        }
+                                        disabled={
+                                          phase !==
+                                          'idle'
+                                        }
+                                      >
+                                        Edit
+                                      </button>
+
+                                      <button
+                                        className="action-btn delete-btn"
+                                        onClick={() =>
+                                          setShowDeleteConfirm(
+                                            c.id
+                                          )
+                                        }
+                                        disabled={
+                                          phase !==
+                                          'idle'
+                                        }
+                                      >
+                                        Delete
+                                      </button>
+
+                                    </div>
 
                                   </div>
 
-                                  <div className="action-btns">
+                                )}
 
-                                    <button
-                                      className="action-btn edit-btn"
-                                      onClick={() =>
-                                        handleEditCandidate(
-                                          c
-                                        )
-                                      }
-                                      disabled={
-                                        phase !==
-                                        'idle'
-                                      }
-                                    >
-                                      Edit
-                                    </button>
-
-                                    <button
-                                      className="action-btn delete-btn"
-                                      onClick={() =>
-                                        setShowDeleteConfirm(
-                                          c.id
-                                        )
-                                      }
-                                      disabled={
-                                        phase !==
-                                        'idle'
-                                      }
-                                    >
-                                      Delete
-                                    </button>
-
-                                  </div>
-
-                                </div>
-
-                              )}
-
-                            </div>
-                          )
-                        )}
+                              </div>
+                            )
+                          )}
+                        </div>
 
                       </div>
                     )

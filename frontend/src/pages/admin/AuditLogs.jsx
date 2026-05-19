@@ -5,6 +5,10 @@ import Footer from '../../components/Footer';
 
 const AuditLogs = () => {
   const navigate = useNavigate();
+  const admin = JSON.parse(sessionStorage.getItem('admin'));
+if (!admin || admin.role !== 'mainAdmin') {
+  navigate('/admin/dashboard');
+}
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,6 +25,9 @@ const AuditLogs = () => {
   }, []);
 
   const fetchLogs = async () => {
+    setLoading(true);
+    setError('');
+    
     try {
       const token = sessionStorage.getItem('token');
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/audit-logs`, {
@@ -37,6 +44,7 @@ const AuditLogs = () => {
       setLogs(data);
     } catch (err) {
       setError('Failed to load audit logs');
+      console.error('Fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -80,7 +88,7 @@ const AuditLogs = () => {
     const matchesFilter = filter === 'ALL' || log.status === filter;
     const matchesSearch =
       search === '' ||
-      log.action.toLowerCase().includes(search.toLowerCase()) ||
+      log.action?.toLowerCase().includes(search.toLowerCase()) ||
       (log.ipAddress && log.ipAddress.includes(search)) ||
       (log.userModel && log.userModel.toLowerCase().includes(search.toLowerCase()));
     return matchesFilter && matchesSearch;
@@ -100,7 +108,7 @@ const AuditLogs = () => {
               <div>
                 <h2 style={{ margin: 0 }}>Audit Logs</h2>
                 <p style={{ margin: '4px 0 0', color: '#888', fontSize: '14px' }}>
-                  Last 50 system activities
+                  System activity history
                 </p>
               </div>
               <button
@@ -140,11 +148,33 @@ const AuditLogs = () => {
                 <option value="INFO">Info</option>
               </select>
               <button
-                className="btn btn-outline"
+                className="btn btn-primary"
                 onClick={fetchLogs}
-                style={{ fontSize: '14px', padding: '8px 16px', whiteSpace: 'nowrap' }}
+                disabled={loading}
+                style={{ 
+                  fontSize: '14px', 
+                  padding: '8px 16px', 
+                  whiteSpace: 'nowrap',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? 'not-allowed' : 'pointer'
+                }}
               >
-                🔄 Refresh
+                {loading ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    🔄 Refresh
+                  </>
+                )}
               </button>
             </div>
 
@@ -191,10 +221,26 @@ const AuditLogs = () => {
                 Loading audit logs...
               </div>
             ) : error ? (
-              <div className="alert alert-error">{error}</div>
+              <div className="alert alert-error" style={{ textAlign: 'center' }}>
+                {error}
+                <button
+                  onClick={fetchLogs}
+                  style={{
+                    marginLeft: '12px',
+                    padding: '4px 12px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: '#c62828',
+                    color: 'white',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Try Again
+                </button>
+              </div>
             ) : filteredLogs.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-                No logs found
+                No logs found matching your criteria
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -207,6 +253,7 @@ const AuditLogs = () => {
                       background: '#f9f9f9',
                       border: '1px solid #eee',
                       borderLeft: `4px solid ${getStatusColor(log.status)}`,
+                      transition: 'all 0.2s ease',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
@@ -215,7 +262,7 @@ const AuditLogs = () => {
                         <span style={{ fontSize: '20px' }}>{getActionIcon(log.action)}</span>
                         <div>
                           <div style={{ fontWeight: '700', fontSize: '14px', color: '#222' }}>
-                            {log.action.replace(/_/g, ' ')}
+                            {log.action?.replace(/_/g, ' ') || 'Unknown Action'}
                           </div>
                           <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>
                             {log.userModel || 'System'} • IP: {log.ipAddress || 'N/A'}
@@ -258,7 +305,7 @@ const AuditLogs = () => {
                           fontFamily: 'monospace',
                         }}
                       >
-                        {JSON.stringify(log.details)}
+                        {JSON.stringify(log.details, null, 2)}
                       </div>
                     )}
                   </div>
@@ -269,6 +316,8 @@ const AuditLogs = () => {
         </div>
       </div>
       <Footer />
+
+      
     </div>
   );
 };

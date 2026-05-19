@@ -6,6 +6,10 @@ import { resetAllData } from '../../services/adminService';
 
 const Settings = () => {
   const navigate = useNavigate();
+  const admin = JSON.parse(sessionStorage.getItem('admin'));
+if (!admin || admin.role !== 'mainAdmin') {
+  navigate('/admin/dashboard');
+}
 
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
