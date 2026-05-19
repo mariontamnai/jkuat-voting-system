@@ -10,6 +10,10 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AddStudent = () => {
   const navigate = useNavigate();
+  const admin = JSON.parse(sessionStorage.getItem('admin'));
+if (!admin || admin.role !== 'mainAdmin') {
+  navigate('/admin/dashboard');
+}
 
   const [showPassword, setShowPassword] = useState(false);
   const [faceDetectedAdmin, setFaceDetectedAdmin] = useState(false);
@@ -42,7 +46,6 @@ const AddStudent = () => {
     scoreThreshold: 0.3,
   });
 
-  const admin = JSON.parse(sessionStorage.getItem('admin'));
 
   // ✅ Preload models on mount so they're ready when camera opens
   useEffect(() => {

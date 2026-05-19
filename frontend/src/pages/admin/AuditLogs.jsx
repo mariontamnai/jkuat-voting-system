@@ -5,6 +5,10 @@ import Footer from '../../components/Footer';
 
 const AuditLogs = () => {
   const navigate = useNavigate();
+  const admin = JSON.parse(sessionStorage.getItem('admin'));
+if (!admin || admin.role !== 'mainAdmin') {
+  navigate('/admin/dashboard');
+}
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
