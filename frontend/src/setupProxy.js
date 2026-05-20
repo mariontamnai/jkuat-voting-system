@@ -4,7 +4,7 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'https://secure-online-voting-system-production.up.railway.app',
+      target: "https://secure-online-voting-system-1xj1.onrender.com",
       changeOrigin: true,
       secure: false,
       logLevel: 'debug',
