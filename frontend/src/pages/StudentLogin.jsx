@@ -123,6 +123,7 @@ const StudentLogin = () => {
               </label>
               <input
                 type="text"
+                data-testid="login-regno-input"
                 placeholder="e.g. SCT111-0111/1900"
                 value={regNo}
                 onChange={(e) => setRegNo(e.target.value)}
@@ -146,6 +147,7 @@ const StudentLogin = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  data-testid="login-password-input"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -191,6 +193,7 @@ const StudentLogin = () => {
             {/* Login button */}
             <button
               onClick={handleLogin}
+              data-testid="login-submit-button"
               disabled={loading}
               className="w-full py-3.5 rounded-lg bg-[#2d6a2d] hover:bg-[#245a24]
                          text-white text-xs font-black tracking-widest uppercase
