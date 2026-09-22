@@ -104,7 +104,7 @@ const StudentLogin = () => {
           <div className="px-8 py-7">
             {/* Error alert */}
             {error && (
-              <div
+              <div data-testid="login-error-message"
                 className="flex items-center gap-2 bg-red-50 border border-red-200
                               text-red-700 rounded-lg px-4 py-3 text-sm font-semibold mb-5"
               >
